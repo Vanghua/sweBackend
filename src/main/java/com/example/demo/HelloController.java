@@ -77,4 +77,8 @@ public class HelloController {
         }
         return ar;
     }
+    @PostMapping("/api/HH")
+    public String hh(){
+        return "黄皓666";
+    }
 }
