@@ -21,6 +21,10 @@ public class HelloController {
         // return表示向web服务器发送响应，响应内容是"通过get请求域服务器交互成功
         return "通过get请求与服务器交互成功";
     }
+    @GetMapping("/test")
+    public String hello(){
+        return "赵雨淋太强了";
+    }
 
     // 接收Post请求: 如果请求的url是http://39.96.175.246:8051/api/login，且请求类型是post，那么将执行下述代码
     // 下述代码的作用是测试简略的登录功能
