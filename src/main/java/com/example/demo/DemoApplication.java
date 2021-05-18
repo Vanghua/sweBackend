@@ -14,10 +14,9 @@ public class DemoApplication {
 		SpringApplication.run(DemoApplication.class, args);
 
 		// 测试是否能在命令行进行输出
-		// normal.work();
+//		 normal.work();
 
 		// 测试数据库连接
-		// conSql.connectTest();
+//		 conSql.connectTest();
 	}
-
 }

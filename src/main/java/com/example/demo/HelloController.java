@@ -77,8 +77,4 @@ public class HelloController {
         }
         return ar;
     }
-    @PostMapping("/api/HH")
-    public String HuanghaoReturn(){
-        return "黄皓真牛1,黄皓真牛2";
-    }
 }
