@@ -23,7 +23,7 @@ public class HelloController {
     }
     @GetMapping("/test")
     public String hello(){
-        return "赵玉淋太强了";
+        return "赵玉淋太好了";
     }
 
     // 接收Post请求: 如果请求的url是http://39.96.175.246:8051/api/login，且请求类型是post，那么将执行下述代码
