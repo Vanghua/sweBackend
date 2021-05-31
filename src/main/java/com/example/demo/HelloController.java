@@ -34,9 +34,9 @@ public class HelloController {
     public String login(@RequestBody User user){
         // 如果用户名是Danny那么反馈给前端"登陆成功"
         if(user.getName().equals("Danny"))
-            return "登录成功";
+            return "all";
         else
-            return "登录失败";
+            return "失败";
     }
 
     // 接收Post请求: 如果请求的url是http://39.96.175.246:8051/api/userName，且请求类型是post，那么将执行下述代码
@@ -80,5 +80,9 @@ public class HelloController {
     @PostMapping("/api/HH")
     public String hh(){
         return "黄皓666";
+    }
+    @GetMapping("/test/api")
+    public String huanghao(){
+        return "哈哈哈";
     }
 }
