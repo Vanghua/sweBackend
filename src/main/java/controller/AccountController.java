@@ -96,6 +96,7 @@ public class AccountController {
 		if(result.equals("邮箱已存在!")) {
 			return "已存在";
 		}else {
+			Global.mu.sendMessage(emailInfo.getEmail(), "注册验证码", result, null);
 			return "发送成功";
 		}
 	}
