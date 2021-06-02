@@ -83,7 +83,7 @@ public class AccountController {
 				loginInfo.getAccountPassword())) {
 			return "all";
 		}else {
-			return "用户名或密码错误";
+			return "错误";
 		}
 	}
 	
