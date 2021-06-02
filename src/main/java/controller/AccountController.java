@@ -19,8 +19,6 @@ import accountSystem.trans.RegisterInfo;
  */
 
 
-
-
 @RestController
 public class AccountController {
 	@PostMapping("api/account/register")
