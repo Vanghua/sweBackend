@@ -74,7 +74,7 @@ public class AccountController {
 		}
 	}
 	
-	@PostMapping("api/account/login")
+	@PostMapping("api/account/login111")
 	public String login(@RequestBody LoginInfo loginInfo) {
 		if(Global.ju.exists("select * "
 				+ "from account "
