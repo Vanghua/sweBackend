@@ -72,7 +72,7 @@ public class AccountController {
 		}
 	}
 	
-	@PostMapping("account/login")
+	@PostMapping("api/ccount/login")
 	public String login(@RequestBody LoginInfo loginInfo) {
 		ArrayList<HashMap<String, Object>> resultList = 
 				Global.ju.query("select account_type "
