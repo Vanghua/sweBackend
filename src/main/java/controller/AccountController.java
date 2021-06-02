@@ -40,7 +40,7 @@ public class AccountController {
 					registerInfo.getAccountEmail(), 
 					registerInfo.getValidationCode())) { // 检验验证码
 				
-				if(registerInfo.getAccountType().equals("普通用户")) { // 普通用户
+				if(registerInfo.getAccountType().equals("user")) { // 普通用户
 					Global.ju.execute("insert into account values(?,?,?,?)", 
 							registerInfo.getAccountName(), 
 							registerInfo.getAccountPassword(), 
