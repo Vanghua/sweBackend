@@ -72,14 +72,17 @@ public class AccountController {
 		}
 	}
 	
-	@PostMapping("api/account/login")
+	@PostMapping("account/login")
 	public String login(@RequestBody LoginInfo loginInfo) {
-		if(Global.ju.exists("select * "
-				+ "from account "
-				+ "where account_name = ? and account_password = ?", 
-				loginInfo.getAccountName(), 
-				loginInfo.getAccountPassword())) {
-			return "all";
+		ArrayList<HashMap<String, Object>> resultList = 
+				Global.ju.query("select account_type "
+						+ "from account "
+						+ "where account_name = ? and account_type = ?", 
+						loginInfo.getAccountName(), 
+						loginInfo.getAccountPassword());
+		
+		if(!resultList.isEmpty()) {
+			return (String) resultList.get(0).get("account_type");
 		}else {
 			return "错误";
 		}
