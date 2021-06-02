@@ -98,7 +98,6 @@ public class JdbcUtilV2 {
             preparedStatement = connection.prepareStatement(sql);
             setPreparedStatement(params);
             resultSet = preparedStatement.executeQuery();
-            
             return resultSet.next();
         }catch (Exception e){
             System.err.println("查询失败！");

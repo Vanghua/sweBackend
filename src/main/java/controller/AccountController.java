@@ -23,7 +23,7 @@ import accountSystem.trans.RegisterInfo;
 
 @RestController
 public class AccountController {
-	@PostMapping("account/register")
+	@PostMapping("api/account/register")
 	public String register(@RequestBody RegisterInfo registerInfo) {
 		if(Global.ju.exists("select * "
 				+ "from account "
@@ -74,21 +74,20 @@ public class AccountController {
 		}
 	}
 	
-	@PostMapping("account/login")
+	@PostMapping("api/account/login")
 	public String login(@RequestBody LoginInfo loginInfo) {
 		if(Global.ju.exists("select * "
 				+ "from account "
 				+ "where account_name = ? and account_password = ?", 
 				loginInfo.getAccountName(), 
 				loginInfo.getAccountPassword())) {
-			
-			return loginInfo.getAccountName();
+			return "all";
 		}else {
 			return "用户名或密码错误";
 		}
 	}
 	
-	@PostMapping("account/getValidation")
+	@PostMapping("api/account/getValidation")
 	public String getValidation(@RequestBody EmailInfo emailInfo) {
 		String sql = "select get_validation(?) as result";
 		ArrayList<HashMap<String, Object>> resultList = Global.ju.query(sql, emailInfo.getEmail());
