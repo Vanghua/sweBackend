@@ -15,4 +15,5 @@ public class ForgetPasswordInfo { // 未登录用户点击忘记密码时发送
 	public void setAccountEmail(String accountEmail) {
 		this.accountEmail = accountEmail;
 	}
+	// ddd
 }

@@ -149,7 +149,11 @@ public class AccountController {
 			return "修改成功";
 		}else {
 			return "用户名或验证码错误";
-		}
-		
+		}	
 	}
+	
+//	@PostMapping("api/account/updatePersonalInfo")
+//	public String updatePersonalInfo() {
+//		
+//	}
 }

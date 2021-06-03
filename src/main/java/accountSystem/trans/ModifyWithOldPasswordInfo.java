@@ -23,5 +23,5 @@ public class ModifyWithOldPasswordInfo { // 已登录用户点击修改密码时
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
 	}
-	
+	// ddd
 }

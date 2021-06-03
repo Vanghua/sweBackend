@@ -22,4 +22,5 @@ public class PersonalInfo {
 	public void setAccountName(String accountName) {
 		this.accountName = accountName;
 	}
+	//
 }
