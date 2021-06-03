@@ -28,6 +28,24 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>Zyl</groupId>
+			<artifactId>email</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>Zyl2</groupId>
+			<artifactId>email2</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>Zyl3</groupId>
+			<artifactId>mysql</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -38,22 +56,22 @@
 			</plugin>
 
 			<!-- 下面插件的作用是能够把本地引入的第三方jar包打包时打进war(测试打进jar不行) -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<warName>${project.artifactId}</warName>
-					<webResources>
-						<resource>
-							<directory>lib/</directory>
-							<targetPath>WEB-INF/lib</targetPath>
-							<includes>
-								<include>**/*.jar</include>
-							</includes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-war-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<warName>${project.artifactId}</warName>-->
+<!--					<webResources>-->
+<!--						<resource>-->
+<!--							<directory>lib/</directory>-->
+<!--							<targetPath>WEB-INF/lib</targetPath>-->
+<!--							<includes>-->
+<!--								<include>**/*.jar</include>-->
+<!--							</includes>-->
+<!--						</resource>-->
+<!--					</webResources>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 

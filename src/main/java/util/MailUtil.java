@@ -29,6 +29,12 @@ public class MailUtil{
 		}
 		Properties properties = System.getProperties();
 		properties.setProperty("mail.smtp.host", host);
+		/*-启用465端口发送邮件，阿里云服务器禁用默认的25端口-*/
+		properties.put("mail.smtp.host", host);
+		properties.put("mail.smtp.port", "465");
+		properties.put("mail.transport.protocol", "smtp");
+		properties.put("mail.smtp.ssl.enable", "true");
+		/*---*/
 		properties.put("mail.smtp.auth", "true");
 		session = Session.getDefaultInstance(properties, new Authenticator() {
 			public PasswordAuthentication getPasswordAuthentication() {
