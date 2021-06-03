@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import warehouseSystem.trans.GoodInfo;
+import warehouseSystem.trans.QueryInfo;
 import warehouseSystem.trans.ShelfInfo;
 import warehouseSystem.trans.WarehouseInfo;
 
@@ -21,6 +22,7 @@ import java.util.Map;
 */
 @RestController
 public class WarehouseController {
+    // 货物添加
     @PostMapping("/api/warehouse/addGood")
     public String addGood(@RequestBody GoodInfo goodInfo) {
         if (Global.ju.exists("select * from good where good_TsegmentCode = ?", goodInfo.getGoodTsegmentcode())) {
@@ -34,11 +36,22 @@ public class WarehouseController {
             return "货物已成功录入";
         }
     }
+
+    // 货物存位查询
+    @PostMapping("/api/warehouse/goodQuery")
+    public ArrayList<HashMap<String, Object>> goodQuery(@RequestBody GoodInfo goodInfo) {
+        String sql = "select * from storage where storage_goodId = ?";
+        ArrayList<HashMap<String, Object>> resultList;
+        resultList = Global.ju.query(sql, goodInfo.getGoodId());
+        return resultList;
+    }
+
+    // 仓库添加
     @PostMapping("/api/warehouse/addWarehouse")
-    public String addwarehouse(@RequestBody WarehouseInfo warehouseInfo){
-        if(Global.ju.exists("select * from warehouse where warehouse_lng = ? and warehouse_lat = ?",warehouseInfo.getWarehouseLng(),warehouseInfo.getWarehouseLat())){
+    public String addwarehouse(@RequestBody WarehouseInfo warehouseInfo) {
+        if (Global.ju.exists("select * from warehouse where warehouse_lng = ? and warehouse_lat = ?", warehouseInfo.getWarehouseLng(), warehouseInfo.getWarehouseLat())) {
             return "仓库已存在";
-        }else{
+        } else {
             Global.ju.execute("insert into warehouse values(default,?,?,?,?,?,default,?,?)",
                     warehouseInfo.getWarehouseType(),
                     warehouseInfo.getWarehhouseStoragenum(),
@@ -50,13 +63,47 @@ public class WarehouseController {
             return "仓库已成功添加";
         }
     }
+
+    // 全部仓库查询
+    @PostMapping("/api/warehouse/warehousQueryAll")
+    public ArrayList<HashMap<String, Object>> warehouseQueryAll(@RequestBody QueryInfo queryInfo) {
+        String sql = "select * from warehouse";
+        ArrayList<HashMap<String, Object>> resultList;
+        ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+        resultList = Global.ju.query(sql);
+        int size = resultList.size();
+        int count = queryInfo.getPageCount();
+        if (size > count) {
+            int absInt = Math.abs(size / count);
+            if (size - absInt * count > 0) {
+                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList(absInt * count, size));
+            }
+            for (int i = 1; i < absInt + 1; ++i) {
+                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList((i - 1) * count, i * count));
+            }
+        } else {
+            listAll.add(resultList);
+        }
+        return listAll.get(queryInfo.getPageNum());
+    }
+
+    // 特定仓库查询
+    @PostMapping("/api/warehouse/warehouseQuery")
+    public ArrayList<HashMap<String, Object>> warehouseQuery(@RequestBody WarehouseInfo warehouseInfo) {
+        String sql = "select * from warehouse where warehouse_id = ?";
+        ArrayList<HashMap<String, Object>> resultList;
+        resultList = Global.ju.query(sql, warehouseInfo.getWarehouseId());
+        return resultList;
+    }
+
+    // 货架添加
     @PostMapping("/api/warehouse/addShelf")
-    public String addShelf(@RequestBody ShelfInfo shelfInfo){
-        if(Global.ju.exists("select * from shelf where shelf_id = ?",shelfInfo.getShelfId())){
+    public String addShelf(@RequestBody ShelfInfo shelfInfo) {
+        if (Global.ju.exists("select * from shelf where shelf_id = ?", shelfInfo.getShelfId())) {
             return "货架已存在";
-        }else if(!Global.ju.exists("select * from warehouse where warehouse_id = ?",shelfInfo.getShelfWarehouseId())){
+        } else if (!Global.ju.exists("select * from warehouse where warehouse_id = ?", shelfInfo.getShelfWarehouseId())) {
             return "仓库不存在";
-        }else{
+        } else {
             Global.ju.execute("insert into shelf values(?,?,?)",
                     shelfInfo.getShelfId(),
                     shelfInfo.getShelfWarehouseId(),
@@ -64,6 +111,40 @@ public class WarehouseController {
             return "货架已成功添加";
         }
     }
+
+    //全部货架查询
+    @PostMapping("/api/warehouse/shelfQueryAll")
+    public ArrayList<HashMap<String, Object>> shelfQueryAll(@RequestBody QueryInfo queryInfo) {
+        String sql = "select * from shelf where shelf_warehouseId = ?";
+        ArrayList<HashMap<String, Object>> resultList;
+        ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+        resultList = Global.ju.query(sql, queryInfo.getWarehouseInfo().getWarehouseId());
+        int size = resultList.size();
+        int count = queryInfo.getPageCount();
+        if (size > count) {
+            int absInt = Math.abs(size / count);
+            if (size - absInt * count > 0) {
+                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList(absInt * count, size));
+            }
+            for (int i = 1; i < absInt + 1; ++i) {
+                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList((i - 1) * count, i * count));
+            }
+        } else {
+            listAll.add(resultList);
+        }
+        return listAll.get(queryInfo.getPageNum());
+    }
+
+    // 特定货架查询
+    @PostMapping("/api/warehouse/shelfQuery")
+    public ArrayList<HashMap<String, Object>> shelfQuery(@RequestBody ShelfInfo shelfInfo) {
+        String sql = "select * from shelf where shelf_id = ?";
+        ArrayList<HashMap<String, Object>> resultList;
+        resultList = Global.ju.query(sql, shelfInfo.getShelfId());
+        return resultList;
+    }
+
+    // 入库办理
     @PostMapping("/api/warehouse/warehouing")
     public String warehousing(@RequestBody GoodInfo goodInfo) {
         int warehouse_result = -1;
@@ -113,14 +194,16 @@ public class WarehouseController {
             }
             Global.ju.execute("update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?", goodInfo.getGoodNum(), warehouse_result);
             sql = "select storage_id from storage where storage_goodId = ?";
-            resultList = Global.ju.query(sql,goodInfo.getGoodId());
+            resultList = Global.ju.query(sql, goodInfo.getGoodId());
             storage_id = (int) resultList.get(0).get("storage_id");
-            Global.ju.execute("insert into warehouselist values(default,?,default,?)",storage_id,goodInfo.getManagerId());
+            Global.ju.execute("insert into warehouselist values(default,?,default,?)", storage_id, goodInfo.getManagerId());
             return "入库办理完成";
         }
     }
+
+    // 出库办理
     @PostMapping("/api/warehouse/exwarehousing")
-    public String exwarehousing(@RequestBody GoodInfo goodInfo){
+    public String exwarehousing(@RequestBody GoodInfo goodInfo) {
         //写入出库记录，删除存储细节，更新仓库、货架存位
         int warehouse_id = -1;
         String shelf_id = "";
@@ -129,34 +212,27 @@ public class WarehouseController {
         String warehouse_sql = "";
         String shelf_sql = "";
         ArrayList<HashMap<String, Object>> resultList;
-        if(!Global.ju.exists("select * from storage where storage_goodId = ?",goodInfo.getGoodId())){
+        if (!Global.ju.exists("select * from storage where storage_goodId = ?", goodInfo.getGoodId())) {
             return "货物不存在";
-        }else{
+        } else {
             sql = "select storage_warehouseId,storage_shelfId,sotrage_num from storage where storage_goodId = ?";
-            resultList = Global.ju.query(sql,goodInfo.getGoodId());
+            resultList = Global.ju.query(sql, goodInfo.getGoodId());
             warehouse_sql = "update warehouse set warehouse_storagenum = warehouse_storagenum + ? where warehouse_id = ?";
             shelf_sql = "update shelf set shelf_storageNum = shelf_storageNum + ? where shelf_id = ?";
-            for(HashMap<String,Object> o : resultList){
+            for (HashMap<String, Object> o : resultList) {
                 warehouse_id = (int) o.get("storage_warehouseId");
                 shelf_id = (String) o.get("storage_shelfId");
                 num = (int) o.get("sotrage_num");
-                Global.ju.execute(warehouse_sql,num,warehouse_id);
-                Global.ju.execute(shelf_sql,num,shelf_id);
+                Global.ju.execute(warehouse_sql, num, warehouse_id);
+                Global.ju.execute(shelf_sql, num, shelf_id);
             }
             // 删除存储细节
             sql = "delete from storage where storage_goodId = ?";
-            Global.ju.execute(sql,goodInfo.getGoodId());
+            Global.ju.execute(sql, goodInfo.getGoodId());
             // 写入出库记录
             sql = "insert into ex_warehouselist values(default,?,default,?)";
-            Global.ju.execute(sql,goodInfo.getGoodId(),goodInfo.getManagerId());
+            Global.ju.execute(sql, goodInfo.getGoodId(), goodInfo.getManagerId());
             return "出库办理完成";
         }
-    }
-    @PostMapping("/api/warehouse/goodQuery")
-    public ArrayList<HashMap<String,Object>> goodQuery(@RequestBody GoodInfo goodInfo){
-        String sql = "select * from storage where storage_goodId = ?";
-        ArrayList<HashMap<String, Object>> resultList;
-        resultList = Global.ju.query(sql,goodInfo.getGoodId());
-        return resultList;
     }
 }

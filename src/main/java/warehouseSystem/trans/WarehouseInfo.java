@@ -16,7 +16,8 @@ public class WarehouseInfo {
     private String warehouseLng;
     private String warehouseLat;
 
-    public WarehouseInfo(){}
+    public WarehouseInfo() {
+    }
 
     public WarehouseInfo(int warehouseId, int warehouseType, int warehhouseStoragenum, String warehouseAddress, String warehouseManager, String warehouseManagerTel, String warehouseCreationtime, String warehouseLng, String warehouseLat) {
         this.warehouseId = warehouseId;
@@ -101,4 +102,5 @@ public class WarehouseInfo {
     public void setWarehouseLat(String warehouseLat) {
         this.warehouseLat = warehouseLat;
     }
+
 }

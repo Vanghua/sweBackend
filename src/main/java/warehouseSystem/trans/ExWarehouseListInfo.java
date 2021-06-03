@@ -5,7 +5,9 @@ public class ExWarehouseListInfo {
     private int exlistGoodId;
     private String exlistOutTime;
     private int exlistManagerId;
-    public ExWarehouseListInfo(){}
+
+    public ExWarehouseListInfo() {
+    }
 
     public ExWarehouseListInfo(int exlistId, int exlistGoodId, String exlistOutTime, int exlistManagerId) {
         this.exlistId = exlistId;

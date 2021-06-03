@@ -15,7 +15,8 @@ public class GoodInfo {
     private int goodType;
     private String managerId;
 
-    public GoodInfo(){}
+    public GoodInfo() {
+    }
 
     public GoodInfo(int goodId, String goodName, int goodNum, String goodTsegmentcode, int goodType) {
         this.goodId = goodId;

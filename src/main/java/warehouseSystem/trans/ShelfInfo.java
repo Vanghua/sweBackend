@@ -8,7 +8,8 @@ public class ShelfInfo {
     private int shelfWarehouseId;
     private int shelfStorageNum;
 
-    public ShelfInfo() {}
+    public ShelfInfo() {
+    }
 
     public ShelfInfo(String shelfId, int shelfWarehouseId, int shelfStorageNum) {
         this.shelfId = shelfId;
@@ -39,4 +40,5 @@ public class ShelfInfo {
     public void setShelfStorageNum(int shelfStorageNum) {
         this.shelfStorageNum = shelfStorageNum;
     }
+
 }

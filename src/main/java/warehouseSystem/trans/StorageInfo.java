@@ -12,7 +12,9 @@ public class StorageInfo {
     private int storageGoodId;
     private int storageShelfId;
     private int storageNum;
-    public StorageInfo() {}
+
+    public StorageInfo() {
+    }
 
     public StorageInfo(int storageId, int storageWarehouseId, int storageGoodId, int storageShelfId, int storageNum) {
         this.storageId = storageId;

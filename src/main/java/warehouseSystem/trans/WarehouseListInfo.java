@@ -6,7 +6,9 @@ public class WarehouseListInfo {
     private String listWarehouseTime;
     private int listManagerId;
 
-    public WarehouseListInfo(){}
+    public WarehouseListInfo() {
+    }
+
     public WarehouseListInfo(int listId, int listStorageId, String listWarehouseTime, int listManagerId) {
         this.listId = listId;
         this.listStorageId = listStorageId;
