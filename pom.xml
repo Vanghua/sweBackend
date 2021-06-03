@@ -55,6 +55,16 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
+			<!-- 樊华打包时使用的插件 -->
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-surefire-plugin</artifactId>-->
+<!--				<version>2.22.2</version>-->
+<!--				<configuration>-->
+<!--					<skipTests>true</skipTests>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
+
 			<!-- 下面插件的作用是能够把本地引入的第三方jar包打包时打进war(测试打进jar不行) -->
 <!--			<plugin>-->
 <!--				<groupId>org.apache.maven.plugins</groupId>-->

@@ -23,5 +23,4 @@ public class ModifyWithoutOldPassword {
 	public void setForgetValidation(String forgetValidation) {
 		this.forgetValidation = forgetValidation;
 	}
-	//ddw
 }
