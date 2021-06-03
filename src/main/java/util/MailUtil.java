@@ -25,7 +25,8 @@ public class MailUtil{
 		}else if(Pattern.compile("^.*@126.com$").matcher(from).matches()) {
 			host = "smtp.126.com";
 		}else {
-			JOptionPane.showConfirmDialog(null, "仅支持QQ/163/126邮箱作为发件人", "发件人错误", JOptionPane.CLOSED_OPTION);
+			System.out.println("no support this mail as sender.");
+			return;
 		}
 		Properties properties = System.getProperties();
 		properties.setProperty("mail.smtp.host", host);
