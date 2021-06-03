@@ -123,7 +123,7 @@ public class WarehouseController {
     public String exwarehousing(@RequestBody GoodInfo goodInfo){
         //写入出库记录，删除存储细节，更新仓库、货架存位
         int warehouse_id = -1;
-        int shelf_id = -1;
+        String shelf_id = "";
         int num;
         String sql = "";
         String warehouse_sql = "";
@@ -138,8 +138,8 @@ public class WarehouseController {
             shelf_sql = "update shelf set shelf_storageNum = shelf_storageNum + ? where shelf_id = ?";
             for(HashMap<String,Object> o : resultList){
                 warehouse_id = (int) o.get("storage_warehouseId");
-                shelf_id = (int) o.get("storage_shelfId");
-                num = (int) o.get("sotrage_num ");
+                shelf_id = (String) o.get("storage_shelfId");
+                num = (int) o.get("sotrage_num");
                 Global.ju.execute(warehouse_sql,num,warehouse_id);
                 Global.ju.execute(shelf_sql,num,shelf_id);
             }
