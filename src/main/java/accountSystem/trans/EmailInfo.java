@@ -1,6 +1,6 @@
 package accountSystem.trans;
 
-public class EmailInfo {
+public class EmailInfo { // 未注册用户注册时发送
 	private String email;
 	public EmailInfo() {}
 	public String getEmail() {

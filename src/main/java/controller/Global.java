@@ -15,4 +15,5 @@ public class Global {
 	public static String mailFrom = "2416116991@qq.com";
 	public static String mailPassword = "bgzbueqduyqzdjgh";
 	public static MailUtil mu = new MailUtil(mailFrom, mailPassword);	
+	
 }
