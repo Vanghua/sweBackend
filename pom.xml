@@ -28,24 +28,24 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!--樊华打包时使用的依赖-->
+<!--		<dependency>-->
+<!--			<groupId>Zyl</groupId>-->
+<!--			<artifactId>email</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
 
-		<dependency>
-			<groupId>Zyl</groupId>
-			<artifactId>email</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>Zyl2</groupId>-->
+<!--			<artifactId>email2</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
 
-		<dependency>
-			<groupId>Zyl2</groupId>
-			<artifactId>email2</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>Zyl3</groupId>
-			<artifactId>mysql</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>Zyl3</groupId>-->
+<!--			<artifactId>mysql</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>
