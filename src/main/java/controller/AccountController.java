@@ -205,7 +205,7 @@ public class AccountController {
 	}
 	
 	@PostMapping("api/account/ui/updateTotalAccountInfo")
-	public TotalAccountInfo updateTotalAccountInfo(@RequestBody AccountNameInfo accountNameInfo) {
+	public TotalAccountInfo updateTotalAccountInfo(@RequestBody AccountNameInfo accountNameInfo) { // 更新基本信息UI
 		String sql = "select account_email, account_type, true_name, telephone "
 				+ "from account "
 				+ "where account_name = ?";
@@ -218,7 +218,7 @@ public class AccountController {
 		
 		result.setAccountName(accountNameInfo.getAccountName());
 		result.setAccountEmail((String) resultList.get(0).get("account_email"));
-		result.setAccountType((String) resultList.get(0).get("account_type"));
+		result.setAccountType( Global.ChineseType.get((String) resultList.get(0).get("account_type")) );
 		result.setTrueName((String) resultList.get(0).get("true_name"));
 		result.setTelephone((String) resultList.get(0).get("telephone"));
 		
