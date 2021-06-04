@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import accountSystem.trans.AccountNameInfo;
 import accountSystem.trans.EmailInfo;
 import accountSystem.trans.ForgetPasswordInfo;
 import accountSystem.trans.LoginInfo;
@@ -15,6 +16,7 @@ import accountSystem.trans.ModifyWithoutOldPassword;
 import accountSystem.trans.PersonalInfo;
 import accountSystem.trans.RegisterInfo;
 import accountSystem.trans.ResetEmailInfo;
+import accountSystem.trans.ui.TotalAccountInfo;
 
 @RestController
 public class AccountController {
@@ -26,6 +28,7 @@ public class AccountController {
 				+ "where account_name = ?", registerInfo.getAccountName())) {
 			
 			return "用户名已被使用";
+			
 		}else if(Global.ju.exists("select * "
 				+ "from account "
 				+ "where account_email = ?", registerInfo.getAccountEmail())) {
@@ -116,12 +119,12 @@ public class AccountController {
 	@PostMapping("api/account/forgetPassword") 
 	public String forgetPassword(@RequestBody ForgetPasswordInfo forgetPasswordInfo) { // 请求发送用于密码找回的验证码
 		String sql = "select * from account where account_name = ? and account_email = ?";
-		if(Global.ju.exists(sql, 
+		if(!Global.ju.exists(sql, 
 				forgetPasswordInfo.getAccountName(), forgetPasswordInfo.getAccountEmail())) {
 			
 			return "用户名或验证邮箱错误";
 		}else {
-			sql = "select get_forgetpassword_validation(?,?) as result";
+			sql = "select get_forgetpassword_validation(?) as result";
 			ArrayList<HashMap<String, Object>> resultList = Global.ju.query(sql, 
 					forgetPasswordInfo.getAccountName());
 			String result = (String) resultList.get(0).get("result");
@@ -199,6 +202,26 @@ public class AccountController {
 		}else {
 			return "错误"; // 验证码错误
 		}
+	}
+	
+	@PostMapping("api/account/ui/updateTotalAccountInfo")
+	public TotalAccountInfo updateTotalAccountInfo(@RequestBody AccountNameInfo accountNameInfo) {
+		String sql = "select account_email, account_type, true_name, telephone "
+				+ "from account "
+				+ "where account_name = ?";
 		
+		ArrayList<HashMap<String, Object>> resultList = Global.ju.query(sql, 
+				accountNameInfo.getAccountName());
+		
+		
+		TotalAccountInfo result = new TotalAccountInfo();
+		
+		result.setAccountName(accountNameInfo.getAccountName());
+		result.setAccountEmail((String) resultList.get(0).get("account_email"));
+		result.setAccountType((String) resultList.get(0).get("account_type"));
+		result.setTrueName((String) resultList.get(0).get("true_name"));
+		result.setTelephone((String) resultList.get(0).get("telephone"));
+		
+		return result;
 	}
 }
