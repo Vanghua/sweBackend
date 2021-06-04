@@ -172,7 +172,7 @@ public class AccountController {
 		 
 		 String result = (String) resultList.get(0).get("result");
 		 
-		 if(result.equals("邮箱已存在")) {
+		 if(result.equals("邮箱已存在!")) {
 			 return "失败";
 		 }else {
 			 Global.mu.sendMessage(emailInfo.getEmail(), "更改验证邮箱" , result, null);
@@ -184,7 +184,7 @@ public class AccountController {
 	public String resetEmail(@RequestBody ResetEmailInfo resetEmailInfo) { // 输入验证码，更新验证邮箱
 		String sql = "select * from reset_email_validation "
 				+ "where account_email = ? and validation_code = ?";
-		if(Global.ju.execute(sql, 
+		if(Global.ju.exists(sql, 
 				resetEmailInfo.getAccountEmail(), resetEmailInfo.getValidationCode())) {
 			
 			Global.ju.execute("update account set account_email = ? where account_name = ?", 
