@@ -139,7 +139,7 @@ public class AccountController {
 		if(Global.ju.exists(sql, modifyWithOldPasswordInfo.getAccountName(), modifyWithOldPasswordInfo.getOldPassword())) {
 			
 			Global.ju.execute("update account set account_password = ? where account_name = ?", 
-					modifyWithOldPasswordInfo.getAccountName(), modifyWithOldPasswordInfo.getNewPassword());
+					modifyWithOldPasswordInfo.getNewPassword(), modifyWithOldPasswordInfo.getAccountName());
 			return "修改成功";
 		}else {
 			return "用户名或密码错误";
