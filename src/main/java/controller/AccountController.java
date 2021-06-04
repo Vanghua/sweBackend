@@ -14,6 +14,7 @@ import accountSystem.trans.ModifyWithOldPasswordInfo;
 import accountSystem.trans.ModifyWithoutOldPassword;
 import accountSystem.trans.PersonalInfo;
 import accountSystem.trans.RegisterInfo;
+import accountSystem.trans.ResetEmailInfo;
 
 @RestController
 public class AccountController {
@@ -45,6 +46,11 @@ public class AccountController {
 							registerInfo.getAccountEmail(),
 							registerInfo.getAccountType());	
 					
+					// 验证邮箱一次有效,使用后删除
+					Global.ju.execute("delete from validation "
+							+ "where account_email = ?", 
+							registerInfo.getAccountEmail());
+					
 					return registerInfo.getAccountType();
 				}else { // 员工用户
 					if(Global.ju.exists("select * "
@@ -60,11 +66,10 @@ public class AccountController {
 								registerInfo.getAccountEmail(),
 								registerInfo.getAccountType());
 						
-						// 验证码一次有效,使用后删除
+						// 验证邮箱一次有效,使用后删除
 						Global.ju.execute("delete from validation "
-								+ "where account_email = ? and validation_code = ?", 
-								registerInfo.getAccountEmail(),
-								registerInfo.getAuthorityCode());
+								+ "where account_email = ?", 
+								registerInfo.getAccountEmail());
 						
 						return registerInfo.getAccountType();
 					}else {
@@ -152,8 +157,48 @@ public class AccountController {
 		}	
 	}
 	
-//	@PostMapping("api/account/updatePersonalInfo")
-//	public String updatePersonalInfo() {
-//		
-//	}
+	@PostMapping("api/account/updatePersonalInfo")
+	public String updatePersonalInfo(@RequestBody PersonalInfo personalInfo) { // 更新个人信息
+		String sql = "update account set true_name = ?, telephone = ? where account_name = ?";
+		Global.ju.execute(sql, personalInfo.getTrueName(), personalInfo.getTelephone(), personalInfo.getAccountName());
+		return "成功";
+	}
+	
+	@PostMapping("api/account/getResetEmailValidation")
+	public String getResetEmailValidation(@RequestBody EmailInfo emailInfo) { // 请求获取重置邮箱的验证码
+		 ArrayList<HashMap<String, Object>> resultList = 
+				 Global.ju.query("select get_reset_email_validation(?) as result", 
+						 emailInfo.getEmail());
+		 
+		 String result = (String) resultList.get(0).get("result");
+		 
+		 if(result.equals("邮箱已存在")) {
+			 return "失败";
+		 }else {
+			 Global.mu.sendMessage(emailInfo.getEmail(), "更改验证邮箱" , result, null);
+			 return "已发送";
+		 }
+	}
+	
+	@PostMapping("api/account/resetEmail")
+	public String resetEmail(@RequestBody ResetEmailInfo resetEmailInfo) { // 输入验证码，更新验证邮箱
+		String sql = "select * from reset_email_validation "
+				+ "where account_email = ? and validation_code = ?";
+		if(Global.ju.execute(sql, 
+				resetEmailInfo.getAccountEmail(), resetEmailInfo.getValidationCode())) {
+			
+			Global.ju.execute("update account set account_email = ? where account_name = ?", 
+					resetEmailInfo.getAccountEmail(),
+					resetEmailInfo.getAccountName());
+			
+			// 一个邮箱仅一次,更改后删除
+			Global.ju.execute("delete from reset_email_validation where account_email = ?", 
+					resetEmailInfo.getAccountEmail());
+			
+			return "成功";
+		}else {
+			return "错误"; // 验证码错误
+		}
+		
+	}
 }
