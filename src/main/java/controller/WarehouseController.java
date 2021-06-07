@@ -66,6 +66,14 @@ public class WarehouseController {
         }
     }
 
+    // 返回仓库总数量
+    @PostMapping("/api/warehouse/warehouseNumQuery")
+    public int warehouseNum() {
+        String sql = "select * from warehouse";
+        ArrayList<HashMap<String, Object>> resultList = Global.ju.query(sql);
+        return resultList.size();
+    }
+
     // 全部仓库查询
     @PostMapping("/api/warehouse/warehouseQueryAll")
     public ArrayList<HashMap<String, Object>> warehouseQueryAll(@RequestBody QueryInfo queryInfo) {
@@ -88,7 +96,7 @@ public class WarehouseController {
             listAll.add(resultList);
         }
         Collections.reverse(listAll);
-        return listAll.get(queryInfo.getPageNum()-1);
+        return listAll.get(queryInfo.getPageNum() - 1);
     }
 
     // 特定仓库查询
@@ -116,27 +124,22 @@ public class WarehouseController {
         }
     }
 
+    //返回货架总数目
+    @PostMapping("/api/warehouse/shelfNumQuery")
+    public int shelfNum(@RequestBody QueryInfo queryInfo) {
+        String sql = "select * from shelf where shelf_warehouseId = ?";
+        ArrayList<HashMap<String, Object>> resultList;
+        resultList = Global.ju.query(sql, queryInfo.getWarehouseInfo().getWarehouseId());
+        return resultList.size();
+    }
+
     //全部货架查询
     @PostMapping("/api/warehouse/shelfQueryAll")
     public ArrayList<HashMap<String, Object>> shelfQueryAll(@RequestBody QueryInfo queryInfo) {
         String sql = "select * from shelf where shelf_warehouseId = ?";
         ArrayList<HashMap<String, Object>> resultList;
-        ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
         resultList = Global.ju.query(sql, queryInfo.getWarehouseInfo().getWarehouseId());
-        int size = resultList.size();
-        int count = queryInfo.getPageCount();
-        if (size > count) {
-            int absInt = Math.abs(size / count);
-            if (size - absInt * count > 0) {
-                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList(absInt * count, size));
-            }
-            for (int i = 1; i < absInt + 1; ++i) {
-                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList((i - 1) * count, i * count));
-            }
-        } else {
-            listAll.add(resultList);
-        }
-        return listAll.get(queryInfo.getPageNum());
+        return resultList;
     }
 
     // 特定货架查询
