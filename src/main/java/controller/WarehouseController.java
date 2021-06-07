@@ -84,7 +84,7 @@ public class WarehouseController {
         } else {
             listAll.add(resultList);
         }
-        return listAll.get(queryInfo.getPageNum());
+        return listAll.get(queryInfo.getPageNum()-1);
     }
 
     // 特定仓库查询
