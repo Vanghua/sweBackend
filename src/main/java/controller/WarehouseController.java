@@ -128,15 +128,16 @@ public class WarehouseController {
         if (size > count) {
             int absInt = Math.abs(size / count);
             if (size - absInt * count > 0) {
-                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList(absInt * count, size));
+                listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
             }
             for (int i = 1; i < absInt + 1; ++i) {
-                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList((i - 1) * count, i * count));
+                listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
             }
         } else {
             listAll.add(resultList);
         }
-        return listAll.get(queryInfo.getPageNum());
+        Collections.reverse(resultList);
+        return listAll.get(queryInfo.getPageNum()-1);
     }
 
     // 特定货架查询
