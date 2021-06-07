@@ -25,6 +25,7 @@ public class HumanController {
             return ar;
 
         }
+        //按照员工姓名id查询
         else if(!human.getTrue_name().isEmpty() && !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_name = ?",human.getAccount_name());
             for(int i=0;i<resultList.size();i++){
@@ -33,6 +34,7 @@ public class HumanController {
             }
             return ar;
         }
+        //查询全部成员
         else {
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_name = ? and  account_type=?",human.getAccount_name(),human.getTrue_name());
             for(int i=0;i<resultList.size();i++){
