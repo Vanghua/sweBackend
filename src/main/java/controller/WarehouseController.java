@@ -1,5 +1,6 @@
 package controller;
 
+import org.assertj.core.util.Lists;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,6 +10,7 @@ import warehouseSystem.trans.ShelfInfo;
 import warehouseSystem.trans.WarehouseInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +67,7 @@ public class WarehouseController {
     }
 
     // 全部仓库查询
-    @PostMapping("/api/warehouse/warehousQueryAll")
+    @PostMapping("/api/warehouse/warehouseQueryAll")
     public ArrayList<HashMap<String, Object>> warehouseQueryAll(@RequestBody QueryInfo queryInfo) {
         String sql = "select * from warehouse";
         ArrayList<HashMap<String, Object>> resultList;
@@ -73,17 +75,19 @@ public class WarehouseController {
         resultList = Global.ju.query(sql);
         int size = resultList.size();
         int count = queryInfo.getPageCount();
+        int absInt = -1;
         if (size > count) {
-            int absInt = Math.abs(size / count);
+            absInt = Math.abs(size / count);
             if (size - absInt * count > 0) {
-                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList(absInt * count, size));
+                listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
             }
             for (int i = 1; i < absInt + 1; ++i) {
-                listAll.add((ArrayList<HashMap<String, Object>>) resultList.subList((i - 1) * count, i * count));
+                listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
             }
         } else {
             listAll.add(resultList);
         }
+        Collections.reverse(listAll);
         return listAll.get(queryInfo.getPageNum()-1);
     }
 
