@@ -125,8 +125,9 @@ public class WarehouseController {
         resultList = Global.ju.query(sql, queryInfo.getWarehouseInfo().getWarehouseId());
         int size = resultList.size();
         int count = queryInfo.getPageCount();
+        int absInt = -1;
         if (size > count) {
-            int absInt = Math.abs(size / count);
+            absInt = Math.abs(size / count);
             if (size - absInt * count > 0) {
                 listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
             }
@@ -136,7 +137,7 @@ public class WarehouseController {
         } else {
             listAll.add(resultList);
         }
-        Collections.reverse(resultList);
+        Collections.reverse(listAll);
         return listAll.get(queryInfo.getPageNum()-1);
     }
 
