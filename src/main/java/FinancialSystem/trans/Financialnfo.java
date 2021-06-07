@@ -1,14 +1,21 @@
 package FinancialSystem.trans;
 
+import java.util.Date;
+
 public class Financialnfo {
+    private int financeid;
     private int billid;
-    private int money;
-    private String time;
+    private String money;
+    private String time_start;
+    private String time_end;
+    private Date time;
     private String type;
+    private String result;
     public Financialnfo(){
 
     }
-    public Financialnfo(int billid,int money,String time,String type){
+    public Financialnfo(int financeid,int billid,String money,Date time,String type){
+        this.financeid = financeid;
         this.billid = billid;
         this.money = money;
         this.time = time;
@@ -16,12 +23,16 @@ public class Financialnfo {
 
     }
 
-    public int getMoney() {
-        return money;
+    public int getFinanceid() {
+        return financeid;
     }
 
-    public void setMoney(int money) {
-        this.money = money;
+    public void setFinanceid(int financeid) {
+        this.financeid = financeid;
+    }
+
+    public Financialnfo(String result){
+        this.result = result;
     }
 
     public int getBillid() {
@@ -32,19 +43,51 @@ public class Financialnfo {
         this.billid = billid;
     }
 
+    public String getMoney() {
+        return money;
+    }
+
+    public void setMoney(String money) {
+        this.money = money;
+    }
+
+    public String getTime_start() {
+        return time_start;
+    }
+
+    public void setTime_start(String time_start) {
+        this.time_start = time_start;
+    }
+
+    public String getTime_end() {
+        return time_end;
+    }
+
+    public void setTime_end(String time_end) {
+        this.time_end = time_end;
+    }
+
     public String getType() {
         return type;
     }
 
-    public String getTime() {
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Date getTime() {
         return time;
     }
 
-    public void setTima(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }
