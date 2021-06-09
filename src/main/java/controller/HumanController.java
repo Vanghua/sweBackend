@@ -31,7 +31,7 @@ public class HumanController {
 
         }
         //按照员工姓名id查询
-        else if(!human.getTrue_name().isEmpty() && !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
+        else if( !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_name = ?",human.getAccount_name());
             for(int i=0;i<resultList.size();i++){
                 HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("type"));
@@ -39,7 +39,7 @@ public class HumanController {
             }
             return ar;
         }
-        else if(!human.getTrue_name().isEmpty() && !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
+        else if( !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_name = ? and account_type = ?",human.getAccount_name(),human.getType());
             for(int i=0;i<resultList.size();i++){
                 HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("type"));
@@ -102,7 +102,7 @@ public class HumanController {
     public String change(@RequestBody HumanChangeInfo change){
         //修改邮箱
         //同时输入员工账号和员工姓名
-        if(change.getAccount_name().isEmpty()|| change.getTrue_name().isEmpty())
+        if(change.getAccount_name().isEmpty())
             return "请输入人员信息";
         //修改员工邮箱信息
         else if(!change.getAccount_email().isEmpty()&&change.getAccount_type().isEmpty()&&change.getTelephone().isEmpty()) {
