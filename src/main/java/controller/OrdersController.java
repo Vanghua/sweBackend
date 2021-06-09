@@ -16,13 +16,17 @@ public class OrdersController {
 
 	@PostMapping("api/orders/createOrders")
 	public String createOrders(@RequestBody CreateOrdersInfo createOrdersInfo) { // 客户发起待审核订单, 返回订单号
-		ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select create_orders(?, ?, ?, ?) as result", 
-				createOrdersInfo.getAccountName(), 
-				createOrdersInfo.getGoodType(), 
-				createOrdersInfo.getSenderInfoId(), 
-				createOrdersInfo.getReceiverInfoId());
+		ArrayList<HashMap<String, Object>> res = Global.ju.query("select create_order(?,?,?,?,?,?,?,?,?,?)",
+			createOrdersInfo.getAccountName(), createOrdersInfo.getGoodType(),
+			createOrdersInfo.getSenderName(), createOrdersInfo.getSenderPhone(), 
+			createOrdersInfo.getSenderAddress(), createOrdersInfo.getSenderDetailAddress(),
+			createOrdersInfo.getReceiverName(), createOrdersInfo.getReceiverPhone(), 
+			createOrdersInfo.getSenderAddress(), createOrdersInfo.getReceiverDetailAddress()
+			);
 		
-		return (String) resultList.get(0).get("result");
+		if(res.isEmpty())
+		return "失败";
+		else return "成功"; // 只要传的对象正确就可以返回成功
 	}
 	
 	@PostMapping("api/orders/checkPass")
