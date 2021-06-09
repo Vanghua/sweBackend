@@ -1,10 +1,7 @@
 package controller;
 
 
-import Humanresource.trans.HumanChangeInfo;
-import Humanresource.trans.HumanDeleteInfo;
-import Humanresource.trans.HumanInfo;
-import Humanresource.trans.VacateInfo;
+import Humanresource.trans.*;
 import org.assertj.core.util.Lists;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,6 +52,19 @@ public class HumanController {
 
 
     }
+    //返回用户数量
+    @PostMapping("api/humanresource/size")
+    public int size(@RequestBody SizeInfo sizeInfo){
+        if(sizeInfo.getType().isEmpty()) {
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account");
+            return resultList.size();
+        }
+        else{
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_type = ?",sizeInfo.getType());
+            return resultList.size();
+        }
+    }
+
     @PostMapping("api/humanresource/queryAll")
     public ArrayList<HashMap<String, Object>> queryAll(@RequestBody HumanInfo human){
         ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account");
