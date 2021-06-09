@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ordersSystem.trans.CheckFailInfo;
 import ordersSystem.trans.CheckPassInfo;
 import ordersSystem.trans.CreateOrdersInfo;
+import ordersSystem.trans.SearchWaitCheckOrdersInfo;
 
 @RestController
 public class OrdersController {
@@ -37,7 +38,7 @@ public class OrdersController {
 				checkPassInfo.getOrdersPrice(),
 				checkPassInfo.getOrdersId());
 		
-		Global.ju.execute("insert into check_result values(?,?,?)", 
+		Global.ju.execute("insert into check_result (orders_id, result, order_manager_name) values(?,?,?)", 
 				checkPassInfo.getOrdersId(), 
 				"通过", 
 				checkPassInfo.getOrderManagerName());
@@ -51,15 +52,36 @@ public class OrdersController {
 				"取消", 
 				checkFailInfo.getOrdersId());
 		
-		Global.ju.execute("insert into check_result values(?,?,?)", 
+		Global.ju.execute("insert into cancle_orders (orders_id) values(?)", 
+				checkFailInfo.getOrdersId());
+		
+		Global.ju.execute("insert into check_result (orders_id, result, order_manager_name) values(?,?,?)", 
 				checkFailInfo.getOrdersId(), 
 				"不通过",
-				checkFailInfo.getDescription());
+				checkFailInfo.getOrderManagerName());
 		
-		Global.ju.execute("insert into end_orders values(?,?)", 
-				checkFailInfo.getOrdersId(), 
-				checkFailInfo.getDescription());
+
 		
 		return "审核完成";
 	}
+	
+	@PostMapping("api/orders/searchWaitCheckOrders")
+	public SearchWaitCheckOrdersInfo[] searchWaitCheckOrders(@RequestBody SearchWaitCheckOrdersInfo searchOrdersInfo) { // 检索待审核订单, 模糊匹配
+		ArrayList<HashMap<String, Object>> res = 
+				Global.ju.query("select orders_id from orders where orders_status = '待审核' and "
+						+ "orders_id like '"+ searchOrdersInfo.getOrdersId() + "%' order by create_time desc");
+		
+		SearchWaitCheckOrdersInfo[] final_ans = new SearchWaitCheckOrdersInfo[res.size()];
+		
+		int x = res.size();
+		
+		for(int i = 0; i < x; ++i) {
+			final_ans[i].setOrdersId((String) res.get(i).get("orders_id"));
+		}
+		
+		return final_ans;
+	}
+	
+//	@PostMapping("api/orders/searchCurrentOrders")
+//	public 
 }
