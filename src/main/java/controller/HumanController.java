@@ -24,7 +24,7 @@ public class HumanController {
         if(human.getTrue_name().isEmpty() && human.getAccount_name().isEmpty() && !human.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_type = ?",human.getType());
             for(int i=0;i<resultList.size();i++){
-                HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("type"));
+                HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("account_type"));
                 ar.add(hum);
             }
             return ar;
@@ -34,7 +34,7 @@ public class HumanController {
         else if( !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_name = ?",human.getAccount_name());
             for(int i=0;i<resultList.size();i++){
-                HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("type"));
+                HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("account_type"));
                 ar.add(hum);
             }
             return ar;
@@ -42,7 +42,7 @@ public class HumanController {
         else if( !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_name = ? and account_type = ?",human.getAccount_name(),human.getType());
             for(int i=0;i<resultList.size();i++){
-                HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("type"));
+                HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("account_type"));
                 ar.add(hum);
             }
             return ar;
