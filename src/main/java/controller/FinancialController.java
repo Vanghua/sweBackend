@@ -115,7 +115,7 @@ public class FinancialController {
     public String addsalary(@RequestBody SalaryInfo salary){
         boolean sta_salary = Global.ju.execute("insert into salary value(?,?,?,?,?)",salary.getName(),salary.getWorkerid(),salary.getBanknum(),salary.getMoney(),salary.getType());
         boolean sta = Global.ju.execute("insert into payoff(payname_id,payname,time,money,received) value(?,?,0,0,default) ",salary.getWorkerid(),salary.getName());
-        boolean sta_check = Global.ju.execute("insert into checkingin value(?,?,default,?)",salary.getWorkerid(),salary.getName(),salary.getType());
+        boolean sta_check = Global.ju.execute("insert into checkingin(id,name,day_num,type) value(?,?,default,?)",salary.getWorkerid(),salary.getName(),salary.getType());
         if(sta_salary == true && sta == true && sta_check == true){
             return "录入工资信息成功";
         }
@@ -204,7 +204,7 @@ public class FinancialController {
             else
                 return "工资发放失败";
         }
-        else if((pay.getName().isEmpty() && !pay.getWorker_id().isEmpty()) || (!pay.getName().isEmpty() && pay.getWorker_id().isEmpty())){
+        else if(pay.getWorker_id().isEmpty()||pay.getName().isEmpty()){
             return "请同时输入员工姓名和员工编号";
         }
         else

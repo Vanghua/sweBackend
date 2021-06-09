@@ -6,6 +6,8 @@ public class HumanInfo {
     private String email;
     private String telephone;
     private String type;
+    private int number;
+    private int current_page;
     public HumanInfo(){
 
     }
@@ -56,5 +58,21 @@ public class HumanInfo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int getCurrent_page() {
+        return current_page;
+    }
+
+    public void setCurrent_page(int current_page) {
+        this.current_page = current_page;
     }
 }
