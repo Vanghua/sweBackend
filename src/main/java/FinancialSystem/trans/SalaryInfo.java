@@ -1,32 +1,21 @@
 package FinancialSystem.trans;
 
 public class SalaryInfo {
-    private String type;
-    private String time;
     private String name;
+    private String workerid;
+    private String banknum;
+    private int money;
+    private String type;
     public SalaryInfo(){
 
     }
-    public SalaryInfo(String type, String time, String name){
-        this.type = type;
-        this.time = time;
+    public SalaryInfo(String name,String workerid,String banknum,int money,String type){
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
+        this.workerid = workerid;
+        this.banknum = banknum;
+        this.money = money;
         this.type = type;
-    }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
     }
 
     public String getName() {
@@ -35,5 +24,37 @@ public class SalaryInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getWorkerid() {
+        return workerid;
+    }
+
+    public void setWorkerid(String workerid) {
+        this.workerid = workerid;
+    }
+
+    public String getBanknum() {
+        return banknum;
+    }
+
+    public void setBanknum(String banknum) {
+        this.banknum = banknum;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
