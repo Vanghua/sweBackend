@@ -45,7 +45,7 @@ public class AccountController {
 				
 				if(registerInfo.getAccountType().equals("user")) { // 普通用户
 					Global.ju.execute("insert into account(account_name, account_password, "
-							+ "account_email, account_type values(?,?,?,?)", 
+							+ "account_email, account_type) values(?,?,?,?)", 
 							registerInfo.getAccountName(), 
 							registerInfo.getAccountPassword(), 
 							registerInfo.getAccountEmail(),
@@ -65,7 +65,7 @@ public class AccountController {
 							registerInfo.getAuthorityCode())) { // 检验授权码是否能够注册该身份的员工
 						
 						Global.ju.execute("insert into account(account_name, account_password, "
-								+ "account_email, account_type values(?,?,?,?)", 
+								+ "account_email, account_type) values(?,?,?,?)", 
 								registerInfo.getAccountName(),
 								registerInfo.getAccountPassword(),
 								registerInfo.getAccountEmail(),
