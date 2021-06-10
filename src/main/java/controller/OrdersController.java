@@ -17,8 +17,8 @@ public class OrdersController {
 
 	@PostMapping("api/orders/createOrders")
 	public String createOrders(@RequestBody CreateOrdersInfo createOrdersInfo) { // 客户发起待审核订单, 返回订单号
-		ArrayList<HashMap<String, Object>> res = Global.ju.query("select create_order(?,?,?,?,?,?,?,?,?,?)",
-			createOrdersInfo.getAccountName(), createOrdersInfo.getUserPriority(),
+		ArrayList<HashMap<String, Object>> res = Global.ju.query("select create_order(?,?,?,?,?,?,?,?,?,?,?)",
+			createOrdersInfo.getAccountName(), createOrdersInfo.getOrdersName(), createOrdersInfo.getUserPriority(),
 			createOrdersInfo.getSenderName(), createOrdersInfo.getSenderPhone(), 
 			createOrdersInfo.getSenderAddress(), createOrdersInfo.getSenderDetailAddress(),
 			createOrdersInfo.getReceiverName(), createOrdersInfo.getReceiverPhone(), 

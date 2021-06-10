@@ -2,7 +2,14 @@ package ordersSystem.trans;
 
 public class CreateOrdersInfo {
 	private String accountName;  // 订单发起人
-		
+	
+	// 订单名称
+	private String ordersName;
+	
+	// 用户偏好优先度
+	private String userPriority;
+	
+	
 	// 发件人信息
 	private String senderName;
 	private String senderPhone;
@@ -15,9 +22,7 @@ public class CreateOrdersInfo {
 	private String[] receiverAddress;
 	private String receiverDetailAddress;
 	
-	// 用户偏好优先度
-	private String userPriority;
-	
+
 	
 	public String getAccountName() {
 		return accountName;
@@ -78,6 +83,12 @@ public class CreateOrdersInfo {
 	}
 	public void setUserPriority(String userPriority) {
 		this.userPriority = userPriority;
+	}
+	public String getOrdersName() {
+		return ordersName;
+	}
+	public void setOrdersName(String ordersName) {
+		this.ordersName = ordersName;
 	}
 	
 }
