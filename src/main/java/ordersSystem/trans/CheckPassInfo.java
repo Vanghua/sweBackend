@@ -2,6 +2,7 @@ package ordersSystem.trans;
 
 public class CheckPassInfo {
 	private String ordersId;
+	private String goodPriority;
 	private String orderManagerName;
 	private double goodWeight;
 	private double ordersPrice;
@@ -29,5 +30,11 @@ public class CheckPassInfo {
 	}
 	public void setOrdersPrice(double ordersPrice) {
 		this.ordersPrice = ordersPrice;
+	}
+	public String getGoodPriority() {
+		return goodPriority;
+	}
+	public void setGoodPriority(String goodPriority) {
+		this.goodPriority = goodPriority;
 	}
 }

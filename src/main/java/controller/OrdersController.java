@@ -18,7 +18,7 @@ public class OrdersController {
 	@PostMapping("api/orders/createOrders")
 	public String createOrders(@RequestBody CreateOrdersInfo createOrdersInfo) { // 客户发起待审核订单, 返回订单号
 		ArrayList<HashMap<String, Object>> res = Global.ju.query("select create_order(?,?,?,?,?,?,?,?,?,?)",
-			createOrdersInfo.getAccountName(), createOrdersInfo.getGoodType(),
+			createOrdersInfo.getAccountName(), createOrdersInfo.getUserPriority(),
 			createOrdersInfo.getSenderName(), createOrdersInfo.getSenderPhone(), 
 			createOrdersInfo.getSenderAddress(), createOrdersInfo.getSenderDetailAddress(),
 			createOrdersInfo.getReceiverName(), createOrdersInfo.getReceiverPhone(), 
@@ -32,8 +32,9 @@ public class OrdersController {
 	
 	@PostMapping("api/orders/checkPass")
 	public String checkOrders(@RequestBody CheckPassInfo checkPassInfo ) { // 订单审核通过
-		Global.ju.execute("update orders set orders_status = ?, good_weight = ?, orders_price = ? where orders_id = ?", 
+		Global.ju.execute("update orders set orders_status = ?, good_priority = ?, good_weight = ?, orders_price = ? where orders_id = ?", 
 				"待支付",
+				checkPassInfo.getGoodPriority(),
 				checkPassInfo.getGoodWeight(),
 				checkPassInfo.getOrdersPrice(),
 				checkPassInfo.getOrdersId());
@@ -61,7 +62,6 @@ public class OrdersController {
 				checkFailInfo.getOrderManagerName());
 		
 
-		
 		return "审核完成";
 	}
 	

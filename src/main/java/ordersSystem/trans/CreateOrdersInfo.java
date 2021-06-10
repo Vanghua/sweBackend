@@ -15,8 +15,8 @@ public class CreateOrdersInfo {
 	private String[] receiverAddress;
 	private String receiverDetailAddress;
 	
-	// 物品种类
-	private String goodType;
+	// 用户偏好优先度
+	private String userPriority;
 	
 	
 	public String getAccountName() {
@@ -73,11 +73,11 @@ public class CreateOrdersInfo {
 	public void setReceiverDetailAddress(String receiverDetailAddress) {
 		this.receiverDetailAddress = receiverDetailAddress;
 	}
-	public String getGoodType() {
-		return goodType;
+	public String getUserPriority() {
+		return userPriority;
 	}
-	public void setGoodType(String goodType) {
-		this.goodType = goodType;
+	public void setUserPriority(String userPriority) {
+		this.userPriority = userPriority;
 	}
 	
 }
