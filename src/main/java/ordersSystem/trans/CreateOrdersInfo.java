@@ -15,13 +15,48 @@ public class CreateOrdersInfo {
 	private String senderPhone;
 	private String[] senderAddress; // 省 / 市 / (县/区)
 	private String senderDetailAddress;
-	
+	private String senderLng;
+	private String senderLat;
+
+	public String getSenderLng() {
+		return senderLng;
+	}
+
+	public void setSenderLng(String senderLng) {
+		this.senderLng = senderLng;
+	}
+
+	public String getSenderLat() {
+		return senderLat;
+	}
+
+	public void setSenderLat(String senderLat) {
+		this.senderLat = senderLat;
+	}
+
+	public String getReceiverLng() {
+		return receiverLng;
+	}
+
+	public void setReceiverLng(String receiverLng) {
+		this.receiverLng = receiverLng;
+	}
+
+	public String getReceiverLat() {
+		return receiverLat;
+	}
+
+	public void setReceiverLat(String receiverLat) {
+		this.receiverLat = receiverLat;
+	}
+
 	// 收件人信息
 	private String receiverName;
 	private String receiverPhone;
 	private String[] receiverAddress;
 	private String receiverDetailAddress;
-	
+	private String receiverLng;
+	private String receiverLat;
 
 	
 	public String getAccountName() {

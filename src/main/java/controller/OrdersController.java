@@ -30,12 +30,19 @@ public class OrdersController {
 			receiverFormatAddress += createOrdersInfo.getReceiverAddress()[i];
 		}
 
-		ArrayList<HashMap<String, Object>> res = Global.ju.query("select create_order(?,?,?,?,?,?,?,?,?,?,?)",
+		ArrayList<HashMap<String, Object>> res =
+				Global.ju.query(
+						"select create_order" +
+						"(?,?,?,?,?" +
+						",?,?,?,?,?," +
+						"?,?,?,?,?)",
 			createOrdersInfo.getAccountName(), createOrdersInfo.getOrdersName(), createOrdersInfo.getUserPriority(),
 			createOrdersInfo.getSenderName(), createOrdersInfo.getSenderPhone(),
 			senderFormatAddress, createOrdersInfo.getSenderDetailAddress(),
 			createOrdersInfo.getReceiverName(), createOrdersInfo.getReceiverPhone(),
-			receiverFormatAddress, createOrdersInfo.getReceiverDetailAddress()
+			receiverFormatAddress, createOrdersInfo.getReceiverDetailAddress(),
+			createOrdersInfo.getSenderLng(), createOrdersInfo.getSenderLat(),
+			createOrdersInfo.getReceiverLng(), createOrdersInfo.getReceiverLat()
 			);
 
 		if(res.isEmpty())
