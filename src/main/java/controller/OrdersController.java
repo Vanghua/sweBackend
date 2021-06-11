@@ -17,14 +17,27 @@ public class OrdersController {
 
 	@PostMapping("api/orders/createOrders")
 	public String createOrders(@RequestBody CreateOrdersInfo createOrdersInfo) { // 客户发起待审核订单, 返回订单号
+
+
+		String senderFormatAddress = "", receiverFormatAddress = "";
+		for(int i = 0; i < 3; ++i){
+			if(i!=0) {
+				senderFormatAddress += "|";
+				receiverFormatAddress += "|";
+			}
+
+			senderFormatAddress += createOrdersInfo.getSenderAddress()[i];
+			receiverFormatAddress += createOrdersInfo.getReceiverAddress()[i];
+		}
+
 		ArrayList<HashMap<String, Object>> res = Global.ju.query("select create_order(?,?,?,?,?,?,?,?,?,?,?)",
 			createOrdersInfo.getAccountName(), createOrdersInfo.getOrdersName(), createOrdersInfo.getUserPriority(),
-			createOrdersInfo.getSenderName(), createOrdersInfo.getSenderPhone(), 
-			createOrdersInfo.getSenderAddress(), createOrdersInfo.getSenderDetailAddress(),
-			createOrdersInfo.getReceiverName(), createOrdersInfo.getReceiverPhone(), 
-			createOrdersInfo.getSenderAddress(), createOrdersInfo.getReceiverDetailAddress()
+			createOrdersInfo.getSenderName(), createOrdersInfo.getSenderPhone(),
+			senderFormatAddress, createOrdersInfo.getSenderDetailAddress(),
+			createOrdersInfo.getReceiverName(), createOrdersInfo.getReceiverPhone(),
+			receiverFormatAddress, createOrdersInfo.getReceiverDetailAddress()
 			);
-		
+
 		if(res.isEmpty())
 		return "失败";
 		else return "成功"; // 只要传的对象正确就可以返回成功
