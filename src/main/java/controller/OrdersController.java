@@ -134,9 +134,9 @@ public class OrdersController {
 		// 获取某一个用户的所有地址簿信息。 其中的 freq_id 为地址簿编号（12位随机串）。不应该给用户显示，
 		// 但在用户选定常用地址进行删除和修改操作时，这个编号将被传给服务器，用于进行表的修改
 		ArrayList<HashMap<String, Object>> a = Global.ju.query
-				("select freq_id, freq_name, freq_phone, freq_address, freq_detail_address "
+				("select freq_id, freq_name, freq_phone, freq_address, freq_detail_address, freq_type "
 						+ "from freq_address "
-						+ "where freq_name = ?", 
+						+ "where account_name = ?",
 						accountNameInfo.getAccountName()
 				);
 		
@@ -144,12 +144,14 @@ public class OrdersController {
 		QueryFreqAddressInfo[] res = new QueryFreqAddressInfo[len];
 		
 		for(int i = 0; i < len; ++i) {
+			res[i] = new QueryFreqAddressInfo();
 			res[i].setFreqId((String) a.get(i).get("freq_id"));
 			res[i].setFreqName((String) a.get(i).get("freq_name"));
 			res[i].setFreqPhone((String) a.get(i).get("freq_phone"));
 			String formatAddress = (String) a.get(i).get("freq_address");
-			res[i].setFreqAddress(formatAddress.split("|"));
+			res[i].setFreqAddress(formatAddress.split("\\|"));
 			res[i].setFreqDetailAddress((String) a.get(i).get("freq_detail_address"));
+			res[i].setFreqType((String) a.get(i).get("freq_type"));
 		}
 		
 		return res;

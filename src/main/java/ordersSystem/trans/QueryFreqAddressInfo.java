@@ -6,6 +6,7 @@ public class QueryFreqAddressInfo {
 	private String freqPhone;
 	private String[] freqAddress;
 	private String freqDetailAddress;
+	private String freqType;
 	
 	public String getFreqId() {
 		return freqId;
@@ -36,5 +37,13 @@ public class QueryFreqAddressInfo {
 	}
 	public void setFreqDetailAddress(String freqDetailAddress) {
 		this.freqDetailAddress = freqDetailAddress;
+	}
+
+	public String getFreqType() {
+		return freqType;
+	}
+
+	public void setFreqType(String freqType) {
+		this.freqType = freqType;
 	}
 }
