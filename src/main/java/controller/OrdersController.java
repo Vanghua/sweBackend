@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import accountSystem.trans.AccountNameInfo;
 import ordersSystem.trans.CheckFailInfo;
 import ordersSystem.trans.CheckPassInfo;
+import ordersSystem.trans.CreateFreqAddressInfo;
 import ordersSystem.trans.CreateOrdersInfo;
-import ordersSystem.trans.SearchWaitCheckOrdersInfo;
+import ordersSystem.trans.FreqIdAddress;
+import ordersSystem.trans.ModifyFreqAddressInfo;
+import ordersSystem.trans.QueryFreqAddressInfo;
 
 @RestController
 public class OrdersController {
@@ -84,25 +88,72 @@ public class OrdersController {
 
 		return "审核完成";
 	}
-	
-	@PostMapping("api/orders/searchWaitCheckOrders")
-	public SearchWaitCheckOrdersInfo[] searchWaitCheckOrders(@RequestBody SearchWaitCheckOrdersInfo searchOrdersInfo) { // 检索待审核订单, 模糊匹配
-		ArrayList<HashMap<String, Object>> res = 
-				Global.ju.query("select orders_id from orders where orders_status = '待审核' and "
-						+ "orders_id like '"+ searchOrdersInfo.getOrdersId() + "%' order by create_time desc");
-		
-		SearchWaitCheckOrdersInfo[] final_ans = new SearchWaitCheckOrdersInfo[res.size()];
-		
-		int x = res.size();
-		
-		for(int i = 0; i < x; ++i) {
-			final_ans[i].setOrdersId((String) res.get(i).get("orders_id"));
+
+	@PostMapping("api/orders/createFreqAddress")
+	public String createFreqAddress(@RequestBody CreateFreqAddressInfo createFreqAddressInfo) { // 添加常用地址簿
+		String formatAddress = "";
+		for(int i = 0; i < 3; ++i) {
+			if(i != 0) formatAddress += "|";
+			formatAddress += createFreqAddressInfo.getFreqAddress()[i];
 		}
+		Global.ju.query("select create_freq_address(?,?,?,?,?,?) as result", 
+				createFreqAddressInfo.getAccountName(),
+				createFreqAddressInfo.getFreqType(),
+				createFreqAddressInfo.getFreqName(),
+				createFreqAddressInfo.getFreqPhone(),
+				formatAddress,
+				createFreqAddressInfo.getFreqDetailAddress()
+				);
 		
-		return final_ans;
+		return "成功";
 	}
 	
-//	@PostMapping("api/orders/searchCurrentOrders")
-//	public 
+	@PostMapping("api/orders/modifyFreqAddress")
+	public String modifyFreqAddress(@RequestBody ModifyFreqAddressInfo modifyFreqAddressInfo) { // 修改常用地址簿
+		String formatAddress = "";
+		for(int i = 0; i < 3; ++i) {
+			if(i != 0) formatAddress += "|";
+			formatAddress += modifyFreqAddressInfo.getFreqAddress()[i];
+		}
+		
+		
+		Global.ju.execute("update freq_address set freq_name = ?, freq_phone = ?, freq_address = ?, freq_detail_address = ?"
+				+ " where freq_id = ?", modifyFreqAddressInfo.getFreqName(), modifyFreqAddressInfo.getFreqPhone(),
+				formatAddress, modifyFreqAddressInfo.getFreqDetailAddress(), modifyFreqAddressInfo.getFreqId());
+		return "成功";
+	}
+	
+	@PostMapping("api/orders/deleteFreqAddress")
+	public String deleteFreqAddress(@RequestBody FreqIdAddress freqIdAddress) { // 删除常用地址簿
+		Global.ju.execute("delete from freq_address where freq_id = ?", freqIdAddress.getFreqId());
+		return "成功";
+	}
+	
+	@PostMapping("api/orders/getFreqAddress")
+	public QueryFreqAddressInfo[] getFreqAddress(@RequestBody AccountNameInfo accountNameInfo) { 
+		// 获取某一个用户的所有地址簿信息。 其中的 freq_id 为地址簿编号（12位随机串）。不应该给用户显示，
+		// 但在用户选定常用地址进行删除和修改操作时，这个编号将被传给服务器，用于进行表的修改
+		ArrayList<HashMap<String, Object>> a = Global.ju.query
+				("select freq_id, freq_name, freq_phone, freq_address, freq_detail_address "
+						+ "from freq_address "
+						+ "where freq_name = ?", 
+						accountNameInfo.getAccountName()
+				);
+		
+		int len = a.size();
+		QueryFreqAddressInfo[] res = new QueryFreqAddressInfo[len];
+		
+		for(int i = 0; i < len; ++i) {
+			res[i].setFreqId((String) a.get(i).get("freq_id"));
+			res[i].setFreqName((String) a.get(i).get("freq_name"));
+			res[i].setFreqPhone((String) a.get(i).get("freq_phone"));
+			String formatAddress = (String) a.get(i).get("freq_address");
+			res[i].setFreqAddress(formatAddress.split("|"));
+			res[i].setFreqDetailAddress((String) a.get(i).get("freq_detail_address"));
+		}
+		
+		return res;
+	}
+	
 }
 	
