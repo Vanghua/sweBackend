@@ -194,7 +194,7 @@ public class OrdersController {
 						commitQueryInfo.getQueryAccountName()).get(0).get("account_type");
 		
 		if(queryAccountType.equals("user")) { // 如果是普通用户, 我们限制只能查到自己的订单信息
-			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName();
+			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName() + "'";
 		}
 		
 		sql += " order by orders.create_time desc";
