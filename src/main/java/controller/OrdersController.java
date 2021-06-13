@@ -368,7 +368,7 @@ public class OrdersController {
 		ArrayList<HashMap<String, Object>> resList = 
 				Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lat "
 				+ " from orders_position "
-				+ " where orders_id = ?", ordersIdInfo.getOredersId());
+				+ " where orders_id = ?", ordersIdInfo.getOrdersId());
 		
 		OrdersPositionInfo res = new OrdersPositionInfo();
 		
@@ -383,29 +383,30 @@ public class OrdersController {
 	@PostMapping("api/orders/purchaseOrders")
 	public String purchaseOrders(@RequestBody OrdersIdInfo ordersIdInfo) { // 支付按钮
 		
-		Global.ju.execute("update orders set orders_status = '进行中' where orders_status = ?", ordersIdInfo);
+		Global.ju.execute("update orders set orders_status = '进行中' where orders_id = ?", ordersIdInfo.getOrdersId());
 
 		ArrayList<HashMap<String, Object>> resList =
 				Global.ju.query("select orders_name, user_priority, good_priority, orders_price " +
 				" from orders " +
 				" where orders_id = ?",
-				ordersIdInfo.getOredersId());
+				ordersIdInfo.getOrdersId());
 
 		String ordersName = (String) resList.get(0).get("orders_name");
-		int userPriority = (int) resList.get(0).get("user_priority");
-		int goodPriority = (int) resList.get(0).get("good_priority");
+		int userPriority = Integer.valueOf((String) resList.get(0).get("user_priority"));
+		int goodPriority = Global.goodPriorityDict.get((String) resList.get(0).get("good_priority"));
+
 		double ordersPrice = (double) resList.get(0).get("orders_price");
 
 		// cal priority
-		int finalPriority = userPriority * 10 + (int) Global.goodPriorityDict.get(goodPriority);
+		int finalPriority = userPriority * 10 + goodPriority;
 
 		Global.ju.execute("insert into good values(default,?,1,?,?)",
 				ordersName,
 				finalPriority,
-				ordersIdInfo.getOredersId());
+				ordersIdInfo.getOrdersId());
 
 		Global.ju.execute("insert into financialbill values(default, ?, ?, default, ?)",
-				ordersIdInfo.getOredersId(),
+				ordersIdInfo.getOrdersId(),
 				ordersPrice,
 				"订单支付"
 				);

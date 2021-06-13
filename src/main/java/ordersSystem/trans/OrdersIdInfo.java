@@ -1,13 +1,13 @@
 package ordersSystem.trans;
 
 public class OrdersIdInfo {
-	private String oredersId;
+	private String ordersId;
 
-	public String getOredersId() {
-		return oredersId;
+	public String getOrdersId() {
+		return ordersId;
 	}
 
-	public void setOredersId(String oredersId) {
-		this.oredersId = oredersId;
+	public void setOrdersId(String ordersId) {
+		this.ordersId = ordersId;
 	}
 }
