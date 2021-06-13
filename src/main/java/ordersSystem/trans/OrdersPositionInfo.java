@@ -1,22 +1,11 @@
 package ordersSystem.trans;
 
 public class OrdersPositionInfo {
-	private String ordersId;
-	private String warehouseName;
+	private String warehouseAddress;
 	private String warehouseLng;
 	private String warehouseLat;
-	public String getOrdersId() {
-		return ordersId;
-	}
-	public void setOrdersId(String ordersId) {
-		this.ordersId = ordersId;
-	}
-	public String getWarehouseName() {
-		return warehouseName;
-	}
-	public void setWarehouseName(String warehouseName) {
-		this.warehouseName = warehouseName;
-	}
+	
+	
 	public String getWarehouseLng() {
 		return warehouseLng;
 	}
@@ -28,6 +17,12 @@ public class OrdersPositionInfo {
 	}
 	public void setWarehouseLat(String warehouseLat) {
 		this.warehouseLat = warehouseLat;
+	}
+	public String getWarehouseAddress() {
+		return warehouseAddress;
+	}
+	public void setWarehouseAddress(String warehouseAddress) {
+		this.warehouseAddress = warehouseAddress;
 	}
 	
 }
