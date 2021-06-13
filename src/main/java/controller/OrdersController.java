@@ -15,6 +15,7 @@ import ordersSystem.trans.CreateFreqAddressInfo;
 import ordersSystem.trans.CreateOrdersInfo;
 import ordersSystem.trans.FreqIdAddress;
 import ordersSystem.trans.ModifyFreqAddressInfo;
+import ordersSystem.trans.OrdersIdInfo;
 import ordersSystem.trans.OrdersPositionInfo;
 import ordersSystem.trans.QueryCancleOrdersInfo;
 import ordersSystem.trans.QueryFreqAddressInfo;
@@ -362,9 +363,23 @@ public class OrdersController {
 		return res;
 	}
 	
-//	@PostMapping("api/orders/queryOrdersPosition")
-//	public OrdersPositionInfo QueryOrdersPosition(@RequestBody ) {
-//		
-//	}
+	@PostMapping("api/orders/queryOrdersPosition")
+	public OrdersPositionInfo QueryOrdersPosition(@RequestBody OrdersIdInfo ordersIdInfo) {
+		ArrayList<HashMap<String, Object>> resList = 
+				Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lat "
+				+ " from orders_position "
+				+ " where orders_id = ?", ordersIdInfo.getOredersId());
+		
+		OrdersPositionInfo res = new OrdersPositionInfo();
+		
+		res.setWarehouseAddress((String) resList.get(0).get("warehouse_address"));
+		res.setWarehouseLng((String) resList.get(0).get("warehouse_lng"));
+		res.setWarehouseLat((String) resList.get(0).get("warehouse_lat"));
+		
+		return res;
+	}
+	
+//	@PostMapping("api/orders/purchaseOrders")
+//	public String purchaseOrders(@RequestBody )
 }
 	
