@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import accountSystem.trans.AccountNameInfo;
 import ordersSystem.trans.CheckFailInfo;
 import ordersSystem.trans.CheckPassInfo;
+import ordersSystem.trans.CommitQueryInfo;
 import ordersSystem.trans.CreateFreqAddressInfo;
 import ordersSystem.trans.CreateOrdersInfo;
 import ordersSystem.trans.FreqIdAddress;
@@ -160,7 +161,7 @@ public class OrdersController {
 	}
 	
 	@PostMapping("api/orders/queryCancleOrders")
-	public QueryCancleOrdersInfo[] QueryCancleOrders(@RequestBody QueryCancleOrdersInfo cancleOrdersInfo) { // 查询已取消的订单的信息
+	public QueryCancleOrdersInfo[] QueryCancleOrders(@RequestBody CommitQueryInfo commitQueryInfo) { // 查询已取消的订单的信息
 		String sql = "select "
 				// 订单相关信息你
 				+ " orders.orders_id, orders_name, orders_status, cast(create_time as char) as create_time, "
@@ -178,18 +179,18 @@ public class OrdersController {
 		
 		// 订单表右连接 取消订单表, 保证查询得到的一定是 [已取消订单] 的信息
 		
-		if(cancleOrdersInfo.getQueryFilter().equals("name")) { // 按照名称模糊查询
-			sql += " and orders_name like '" + cancleOrdersInfo.getQueryFilterContent() + "%'";
+		if(commitQueryInfo.getQueryFilter().equals("name")) { // 按照名称模糊查询
+			sql += " and orders_name like '" + commitQueryInfo.getQueryFilterContent() + "%'";
 		}else { // 按订单号模糊查询
-			sql += " and orders.orders_id like '" + cancleOrdersInfo.getQueryFilterContent() + "%'";
+			sql += " and orders.orders_id like '" + commitQueryInfo.getQueryFilterContent() + "%'";
 		}
 		
 		String queryAccountType = 
 				(String) Global.ju.query("select account_type from account where account_name = ?", 
-						cancleOrdersInfo.getQueryAccountName()).get(0).get("account_type");
+						commitQueryInfo.getQueryAccountName()).get(0).get("account_type");
 		
 		if(queryAccountType.equals("user")) { // 如果是普通用户, 我们限制只能查到自己的订单信息
-			sql += " and orders.account_name = '" + cancleOrdersInfo.getQueryAccountName();
+			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName();
 		}
 		
 		sql += " order by orders.create_time desc";

@@ -1,13 +1,6 @@
 package ordersSystem.trans;
 
-public abstract class QueryOrdersInfo { // 抽象类, 查询任何已创建订单的共有信息
-	// 查询用户的用户名, 系统将根据用户名判断用户类别, 普通用户只能看到自己的订单, 管理员可以查看所有订单
-	private String QueryAccountName;
-	// 过滤器: 名称 or 订单编号
-	private String QueryFilter; 
-	// 过滤内容:
-	private String QueryFilterContent;
-	
+public abstract class QueryOrdersInfo { // 抽象类, 查询任何已创建订单的共有信息	
 	// 订单号等信息
 	private String ordersId;
 	private String ordersName;
@@ -109,24 +102,5 @@ public abstract class QueryOrdersInfo { // 抽象类, 查询任何已创建订�
 	}
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
-	}
-
-	public String getQueryFilter() {
-		return QueryFilter;
-	}
-	public void setQueryFilter(String queryFilter) {
-		QueryFilter = queryFilter;
-	}
-	public String getQueryFilterContent() {
-		return QueryFilterContent;
-	}
-	public void setQueryFilterContent(String queryFilterContent) {
-		QueryFilterContent = queryFilterContent;
-	}
-	public String getQueryAccountName() {
-		return QueryAccountName;
-	}
-	public void setQueryAccountName(String queryAccountName) {
-		QueryAccountName = queryAccountName;
 	}
 }
