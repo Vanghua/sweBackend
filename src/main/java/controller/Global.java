@@ -30,4 +30,16 @@ public class Global {
 		ChineseType.put("financial", "财务管理员");
 		ChineseType.put("warehouse", "仓库管理员");
 	}
+
+	// good priority dictionary
+	public static HashMap<String, Integer> goodPriorityDict = new HashMap<>();
+	static{
+		goodPriorityDict.put("日用品", 1);
+		goodPriorityDict.put("食品", 2);
+		goodPriorityDict.put("文件", 2);
+		goodPriorityDict.put("衣物", 1);
+		goodPriorityDict.put("数码产品", 3);
+		goodPriorityDict.put("贵重物品", 5);
+		goodPriorityDict.put("其它", 3);
+	}
 }

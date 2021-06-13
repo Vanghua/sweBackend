@@ -385,7 +385,31 @@ public class OrdersController {
 		
 		Global.ju.execute("update orders set orders_status = '进行中' where orders_status = ?", ordersIdInfo);
 
-		
+		ArrayList<HashMap<String, Object>> resList =
+				Global.ju.query("select orders_name, user_priority, good_priority, orders_price " +
+				" from orders " +
+				" where orders_id = ?",
+				ordersIdInfo.getOredersId());
+
+		String ordersName = (String) resList.get(0).get("orders_name");
+		int userPriority = (int) resList.get(0).get("user_priority");
+		int goodPriority = (int) resList.get(0).get("good_priority");
+		double ordersPrice = (double) resList.get(0).get("orders_price");
+
+		// cal priority
+		int finalPriority = userPriority * 10 + (int) Global.goodPriorityDict.get(goodPriority);
+
+		Global.ju.execute("insert into good values(default,?,1,?,?)",
+				ordersName,
+				finalPriority,
+				ordersIdInfo.getOredersId());
+
+		Global.ju.execute("insert into financialbill values(default, ?, ?, default, ?)",
+				ordersIdInfo.getOredersId(),
+				ordersPrice,
+				"订单支付"
+				);
+
 		return "成功";
 	}
 
