@@ -15,6 +15,7 @@ import ordersSystem.trans.CreateFreqAddressInfo;
 import ordersSystem.trans.CreateOrdersInfo;
 import ordersSystem.trans.FreqIdAddress;
 import ordersSystem.trans.ModifyFreqAddressInfo;
+import ordersSystem.trans.OrdersPositionInfo;
 import ordersSystem.trans.QueryCancleOrdersInfo;
 import ordersSystem.trans.QueryFreqAddressInfo;
 import ordersSystem.trans.QueryOrdersInfo;
@@ -244,8 +245,8 @@ public class OrdersController {
 				// 订单相关信息你
 				+ " orders.orders_id, orders_name, orders_status, cast(create_time as char) as create_time, "
 				+ " account_name, user_priority, "
-				+ " sender_name, sender_phone, sender_address, sender_detail_address, "
-				+ " receiver_name, receiver_phone, receiver_address, receiver_detail_address "
+				+ " sender_name, sender_phone, sender_address, sender_detail_address, sender_lng, sender_lat, "
+				+ " receiver_name, receiver_phone, receiver_address, receiver_detail_address, receiver_lng, receiver_lat, "
 				+ " from orders "
 				+ " where orders_status = '待审核' ";
 		
@@ -288,11 +289,15 @@ public class OrdersController {
 			res[i].setSenderPhone((String) cur.get("sender_phone"));
 			res[i].setSenderAddress( ((String) cur.get("sender_address")).split("\\|") );
 			res[i].setSenderDetailAddress((String) cur.get("sender_detail_address"));
+			res[i].setSenderLng((String) cur.get("sender_lng"));
+			res[i].setSenderLat((String) cur.get("sender_lat"));
 			
 			res[i].setReceiverName((String) cur.get("receiver_name"));
 			res[i].setReceiverPhone((String) cur.get("receiver_phone"));
 			res[i].setReceiverAddress(((String) cur.get("receiver_address")).split("\\|"));
 			res[i].setReceiverDetailAddress((String) cur.get("receiver_detail_address"));
+			res[i].setReceiverLng((String) cur.get("receiver_lng"));
+			res[i].setReceiverLat((String) cur.get("receiver_lat"));
 		}
 		
 		return res;
@@ -358,5 +363,10 @@ public class OrdersController {
 		
 		return res;
 	}
+	
+//	@PostMapping("api/orders/queryOrdersPosition")
+//	public OrdersPositionInfo QueryOrdersPosition(@RequestBody ) {
+//		
+//	}
 }
 	

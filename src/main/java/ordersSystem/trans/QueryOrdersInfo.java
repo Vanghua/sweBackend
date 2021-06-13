@@ -13,11 +13,16 @@ public class QueryOrdersInfo { // 抽象类, 查询任何已创建订单的共�
 	private String senderPhone;
 	private String[] senderAddress;
 	private String senderDetailAddress;
+	private String senderLng;
+	private String senderLat;
+	
 	// 收件人
 	private String receiverName;
 	private String receiverPhone;
 	private String[] receiverAddress;
 	private String receiverDetailAddress;
+	private String receiverLng;
+	private String receiverLat;
 	
 	public String getOrdersId() {
 		return ordersId;
@@ -102,5 +107,29 @@ public class QueryOrdersInfo { // 抽象类, 查询任何已创建订单的共�
 	}
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
+	}
+	public String getSenderLng() {
+		return senderLng;
+	}
+	public void setSenderLng(String senderLng) {
+		this.senderLng = senderLng;
+	}
+	public String getSenderLat() {
+		return senderLat;
+	}
+	public void setSenderLat(String senderLat) {
+		this.senderLat = senderLat;
+	}
+	public String getReceiverLng() {
+		return receiverLng;
+	}
+	public void setReceiverLng(String receiverLng) {
+		this.receiverLng = receiverLng;
+	}
+	public String getReceiverLat() {
+		return receiverLat;
+	}
+	public void setReceiverLat(String receiverLat) {
+		this.receiverLat = receiverLat;
 	}
 }
