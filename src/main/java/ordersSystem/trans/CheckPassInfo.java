@@ -6,7 +6,16 @@ public class CheckPassInfo {
 	private String orderManagerName;
 	private double goodWeight;
 	private double ordersPrice;
-	
+	private double ordersCost;
+
+	public double getOrdersCost() {
+		return ordersCost;
+	}
+
+	public void setOrdersCost(double ordersCost) {
+		this.ordersCost = ordersCost;
+	}
+
 	public String getOrdersId() {
 		return ordersId;
 	}
