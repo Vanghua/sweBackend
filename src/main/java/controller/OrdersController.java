@@ -379,7 +379,15 @@ public class OrdersController {
 		return res;
 	}
 	
-//	@PostMapping("api/orders/purchaseOrders")
-//	public String purchaseOrders(@RequestBody )
+	
+	@PostMapping("api/orders/purchaseOrders")
+	public String purchaseOrders(@RequestBody OrdersIdInfo ordersIdInfo) { // 支付按钮
+		
+		Global.ju.execute("update orders set orders_status = '进行中' where orders_status = ?", ordersIdInfo);
+
+		
+		return "成功";
+	}
+
 }
 	
