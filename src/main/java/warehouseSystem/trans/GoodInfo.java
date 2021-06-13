@@ -11,19 +11,18 @@ public class GoodInfo {
     private int goodId;
     private String goodName;
     private int goodNum;
-    private String goodTsegmentcode;
-    private int goodType;
+    private int priority;
     private String managerId;
+    private String orderId;
 
     public GoodInfo() {
     }
 
-    public GoodInfo(int goodId, String goodName, int goodNum, String goodTsegmentcode, int goodType) {
+    public GoodInfo(int goodId, String goodName, int goodNum, int priority, String managerId, String orderId) {
         this.goodId = goodId;
         this.goodName = goodName;
         this.goodNum = goodNum;
-        this.goodTsegmentcode = goodTsegmentcode;
-        this.goodType = goodType;
+        this.priority = priority;
     }
 
     public int getGoodId() {
@@ -50,20 +49,12 @@ public class GoodInfo {
         this.goodNum = goodNum;
     }
 
-    public String getGoodTsegmentcode() {
-        return goodTsegmentcode;
+    public int getPriority() {
+        return priority;
     }
 
-    public void setGoodTsegmentcode(String goodTsegmentcode) {
-        this.goodTsegmentcode = goodTsegmentcode;
-    }
-
-    public int getGoodType() {
-        return goodType;
-    }
-
-    public void setGoodType(int goodType) {
-        this.goodType = goodType;
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     public String getManagerId() {
@@ -72,5 +63,13 @@ public class GoodInfo {
 
     public void setManagerId(String managerId) {
         this.managerId = managerId;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

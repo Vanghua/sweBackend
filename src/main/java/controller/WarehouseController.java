@@ -14,28 +14,35 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-    1.货物添加
-    2.仓库添加
-    3.货架添加
-    4.入库办理
-    5.出库办理
-    6.货物存储位置查询
-*/
 @RestController
 public class WarehouseController {
     // 货物添加
     @PostMapping("/api/warehouse/addGood")
     public String addGood(@RequestBody GoodInfo goodInfo) {
-        if (Global.ju.exists("select * from good where good_TsegmentCode = ?", goodInfo.getGoodTsegmentcode())) {
+        if (Global.ju.exists("select * from good where orders_id = ?", goodInfo.getOrderId())) {
             return "货物已存在";
         } else {
             Global.ju.execute("insert into good values(default,?,?,?,?)",
                     goodInfo.getGoodName(),
                     goodInfo.getGoodNum(),
-                    goodInfo.getGoodTsegmentcode(),
-                    goodInfo.getGoodType());
+                    goodInfo.getPriority(),
+                    goodInfo.getGoodId());
             return "货物已成功录入";
+        }
+    }
+
+    // 删除货物
+    @PostMapping("/api/warehouse/goodDelete")
+    public String goodDelete(@RequestBody String goodId) {
+        if (!Global.ju.exists("select * from good where good_id", goodId)) {
+            return "货物不存在";
+        } else {
+            if (Global.ju.exists("select * from storage where storage_goodId = ?", goodId)) {
+                return "货物仍在存储";
+            } else {
+                Global.ju.execute("delete from good where good_id = ?", goodId);
+                return "货物已删除";
+            }
         }
     }
 
@@ -63,6 +70,23 @@ public class WarehouseController {
                     warehouseInfo.getWarehouseLng(),
                     warehouseInfo.getWarehouseLat());
             return "仓库已成功添加";
+        }
+    }
+
+    // 仓库删除
+    @PostMapping("/api/warehouse/warehouseDelete")
+    public String warehouseDelete(@RequestBody String warehouseId) {
+        int storageNum = -1;
+        if (!Global.ju.exists("select * from shelf where warehouse_id = ?", warehouseId)) {
+            return "仓库不存在";
+        } else {
+            if (Global.ju.exists("select * from storage where storage_warehouseId = ?", warehouseId)) {
+                return "此仓库内仍有货物";
+            } else {
+                Global.ju.execute("delete from shelf where shelf_warehouseId = ?", warehouseId);
+                Global.ju.execute("delete from warehouse where warehouse_id = ?", warehouseId);
+                return "仓库已删除";
+            }
         }
     }
 
@@ -121,6 +145,24 @@ public class WarehouseController {
                     shelfInfo.getShelfWarehouseId(),
                     shelfInfo.getShelfStorageNum());
             return "货架已成功添加";
+        }
+    }
+
+    // 货架删除
+    @PostMapping("/api/warehouse/shelfDelete")
+    public String shelfDelete(@RequestBody ShelfInfo shelfInfo) {
+        int storageNum = -1;
+        if (!Global.ju.exists("select * from shelf where shelf_id = ? and shelf_warehouseId = ?", shelfInfo.getShelfId(), shelfInfo.getShelfWarehouseId())) {
+            return "此仓库内货架不存在";
+        } else {
+            if (Global.ju.exists("select * from storage where storage_shelfId = ? and storage_warehouseId = ?", shelfInfo.getShelfId(), shelfInfo.getShelfWarehouseId())) {
+                return "此货架内仍有货物";
+            } else {
+                storageNum = (int) Global.ju.query("select * from shelf where shelf_id = ?", shelfInfo.getShelfId()).get(0).get("shelf_storageNum");
+                Global.ju.execute("delete from shelf where shelf_id = ?", shelfInfo.getShelfId());
+                Global.ju.execute("update warehouse set warehouse_storagenum = warehouse_storagenum - ?", storageNum);
+                return "删除成功";
+            }
         }
     }
 
