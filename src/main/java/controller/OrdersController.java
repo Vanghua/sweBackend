@@ -181,7 +181,7 @@ public class OrdersController {
 		
 		if(commitQueryInfo.getQueryFilter().equals("name")) { // 按照名称模糊查询
 			sql += " and orders_name like '" + commitQueryInfo.getQueryFilterContent() + "%'";
-		}else { // 按订单号模糊查询
+		}else if(commitQueryInfo.getQueryFilter().equals("id")){ // 按订单号模糊查询
 			sql += " and orders.orders_id like '" + commitQueryInfo.getQueryFilterContent() + "%'";
 		}
 		
