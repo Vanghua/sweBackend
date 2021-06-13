@@ -1,6 +1,6 @@
 package ordersSystem.trans;
 
-public abstract class QueryOrdersInfo { // 抽象类, 查询任何已创建订单的共有信息	
+public class QueryOrdersInfo { // 抽象类, 查询任何已创建订单的共有信息	
 	// 订单号等信息
 	private String ordersId;
 	private String ordersName;

@@ -17,6 +17,7 @@ import ordersSystem.trans.FreqIdAddress;
 import ordersSystem.trans.ModifyFreqAddressInfo;
 import ordersSystem.trans.QueryCancleOrdersInfo;
 import ordersSystem.trans.QueryFreqAddressInfo;
+import ordersSystem.trans.QueryOrdersInfo;
 
 @RestController
 public class OrdersController {
@@ -180,9 +181,11 @@ public class OrdersController {
 		// 订单表右连接 取消订单表, 保证查询得到的一定是 [已取消订单] 的信息
 		
 		if(commitQueryInfo.getQueryFilter().equals("name")) { // 按照名称模糊查询
-			sql += " and orders_name like '" + commitQueryInfo.getQueryFilterContent() + "%'";
+			sql += " where orders_name like '" + commitQueryInfo.getQueryFilterContent() + "%'";
 		}else if(commitQueryInfo.getQueryFilter().equals("id")){ // 按订单号模糊查询
-			sql += " and orders.orders_id like '" + commitQueryInfo.getQueryFilterContent() + "%'";
+			sql += " where orders.orders_id like '" + commitQueryInfo.getQueryFilterContent() + "%'";
+		}else {
+			sql += " where 1=1 ";
 		}
 		
 		String queryAccountType = 
@@ -228,6 +231,67 @@ public class OrdersController {
 			res[i].setCheckResult((String) cur.get("check_result"));
 			res[i].setOrderManagerName((String) cur.get("order_manager_name"));
 			res[i].setCheckDate((String) cur.get("check_date"));
+		}
+		
+		return res;
+	}
+	
+	
+	@PostMapping("api/orders/queryWaitCheckOrders")
+	public QueryOrdersInfo[] QueryWaitCheckOrders(@RequestBody CommitQueryInfo commitQueryInfo) { // 查询待审核的订单的信息
+		String sql = "select "
+				// 订单相关信息你
+				+ " orders.orders_id, orders_name, orders_status, cast(create_time as char) as create_time, "
+				+ " account_name, user_priority, "
+				+ " sender_name, sender_phone, sender_address, sender_detail_address, "
+				+ " receiver_name, receiver_phone, receiver_address, receiver_detail_address "
+				+ " from orders "
+				+ " where orders_status = '待审核' ";
+		
+		// 订单表右连接 取消订单表, 保证查询得到的一定是 [已取消订单] 的信息
+		
+		if(commitQueryInfo.getQueryFilter().equals("name")) { // 按照名称模糊查询
+			sql += " and orders_name like '" + commitQueryInfo.getQueryFilterContent() + "%'";
+		}else if(commitQueryInfo.getQueryFilter().equals("id")){ // 按订单号模糊查询
+			sql += " and orders.orders_id like '" + commitQueryInfo.getQueryFilterContent() + "%'";
+		}
+		
+		String queryAccountType = 
+				(String) Global.ju.query("select account_type from account where account_name = ?", 
+						commitQueryInfo.getQueryAccountName()).get(0).get("account_type");
+		
+		if(queryAccountType.equals("user")) { // 如果是普通用户, 我们限制只能查到自己的订单信息
+			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName();
+		}
+		
+		sql += " order by orders.create_time ansc";
+		
+		ArrayList<HashMap<String, Object>> resList = Global.ju.query(sql);
+		
+		int len = resList.size();
+		
+		QueryOrdersInfo[] res = new QueryOrdersInfo[len];
+		
+		for(int i = 0; i < len; ++i) {
+			res[i] = new QueryOrdersInfo();
+			HashMap<String, Object> cur = resList.get(i);
+			
+			res[i].setOrdersId((String) cur.get("orders_id"));
+			res[i].setOrdersName((String) cur.get("orders_name"));
+			res[i].setOrdersStatus((String) cur.get("orders_status"));
+			res[i].setCreateTime((String) cur.get("create_time"));
+			res[i].setAccountName((String) cur.get("account_name"));
+			res[i].setUserPriority((String) cur.get("user_priority"));
+			
+			res[i].setSenderName((String) cur.get("sender_name"));
+			res[i].setSenderPhone((String) cur.get("sender_phone"));
+			res[i].setSenderAddress( ((String) cur.get("sender_address")).split("\\|") );
+			res[i].setSenderDetailAddress((String) cur.get("sender_detail_address"));
+			
+			res[i].setReceiverName((String) cur.get("receiver_name"));
+			res[i].setReceiverPhone((String) cur.get("receiver_phone"));
+			res[i].setReceiverAddress(((String) cur.get("receiver_address")).split("\\|"));
+			res[i].setReceiverDetailAddress((String) cur.get("receiver_detail_address"));
 		}
 		
 		return res;
