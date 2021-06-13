@@ -263,7 +263,7 @@ public class OrdersController {
 						commitQueryInfo.getQueryAccountName()).get(0).get("account_type");
 
 		if(queryAccountType.equals("user")) { // 如果是普通用户, 我们限制只能查到自己的订单信息
-			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName();
+			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName() + "'";
 		}
 
 		sql += " order by orders.create_time asc";
@@ -323,10 +323,10 @@ public class OrdersController {
 						commitQueryInfo.getQueryAccountName()).get(0).get("account_type");
 		
 		if(queryAccountType.equals("user")) { // 如果是普通用户, 我们限制只能查到自己的订单信息
-			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName();
+			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName() + "'";
 		}
 		
-		sql += " order by orders.create_time ansc";
+		sql += " order by orders.create_time asc";
 		
 		ArrayList<HashMap<String, Object>> resList = Global.ju.query(sql);
 		
@@ -357,7 +357,7 @@ public class OrdersController {
 		
 			res[i].setGoodPriority((String) cur.get("good_priority"));
 			res[i].setGoodWeight((Double) cur.get("good_weight"));;
-			res[i].setOrdersPrice((Integer) cur.get("orders_price"));
+			res[i].setOrdersPrice((Double) cur.get("orders_price"));
 		}
 		
 		return res;
