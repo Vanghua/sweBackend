@@ -36,7 +36,8 @@ public class HumanController {
             }
             return ar;
         }
-        else if( !human.getAccount_name().isEmpty() && human.getType().isEmpty()){
+        //按照员工姓名和类型进行查询。
+        else if( !human.getAccount_name().isEmpty() && !human.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from account where account_name = ? and account_type = ?",human.getAccount_name(),human.getType());
             for(int i=0;i<resultList.size();i++){
                 HumanInfo hum = new HumanInfo((String) resultList.get(i).get("account_name"),(String) resultList.get(i).get("true_name"),(String) resultList.get(i).get("account_email"),(String) resultList.get(i).get("telephone"),(String) resultList.get(i).get("account_type"));
@@ -114,14 +115,7 @@ public class HumanController {
         //同时输入员工账号和员工姓名
         if(change.getAccount_name().isEmpty())
             return "请输入人员信息";
-        //修改员工邮箱信息
-        else if(!change.getAccount_email().isEmpty()&&change.getAccount_type().isEmpty()&&change.getTelephone().isEmpty()) {
-            boolean sta_1 = Global.ju.execute("update from account set account_email = ?", change.getAccount_email());
-            if(sta_1 == true)
-                return "修改成功";
-            else
-                return "修改失败";
-        }
+        //修改手机信息
         else if(change.getAccount_name().isEmpty()&&change.getAccount_type().isEmpty()&&!change.getTelephone().isEmpty()){
             boolean sta_2 = Global.ju.execute("update from account set telephone = ? where account_name = ?",change.getTelephone(),change.getAccount_name());
             if(sta_2 == true)
@@ -130,6 +124,7 @@ public class HumanController {
                 return "修改失败";
 
         }
+        //修改员工类型。
         else if(change.getAccount_name().isEmpty()&&!change.getAccount_type().isEmpty()&&change.getTelephone().isEmpty()){
             boolean sta_3 = Global.ju.execute("update from account set account_type = ? where account-name = ?",change.getAccount_type(),change.getAccount_name());
             if(sta_3 == true)
@@ -137,9 +132,10 @@ public class HumanController {
             else
                 return "修改失败";
         }
+        //同时修改员工类型和员工信息。
         else if(!change.getAccount_name().isEmpty()&&!change.getAccount_type().isEmpty()&&!change.getTelephone().isEmpty()){
-            boolean sta_4 = Global.ju.execute("update from account set account_email = ?,telephone = ?,account_type = ? where account_name = ?",
-                    change.getAccount_email(),change.getTelephone(), change.getAccount_type(),change.getAccount_name());
+            boolean sta_4 = Global.ju.execute("update from account set telephone = ?,account_type = ? where account_name = ?",
+                    change.getTelephone(), change.getAccount_type(),change.getAccount_name());
             if(sta_4 == true)
                 return "修改成功";
             else
@@ -147,8 +143,26 @@ public class HumanController {
         }
         else
             return "请输入信息";
-        //修改电话
-        //修改人员类型
+
+    }
+    //修改邮箱。
+    @PostMapping("api/humanresource/changemail")
+    public String changemail(@RequestBody EmailInfo emailInfo){
+        String sql = "select get_validation(?) as result";
+        ArrayList<HashMap<String, Object>> resultList = Global.ju.query(sql, emailInfo.getAccount_email());
+        String result = (String)resultList.get(0).get("result");
+        if(result.equals("邮箱已存在!")) {
+            return "已存在";
+        }else {
+            Global.mu.sendMessage(emailInfo.getAccount_email(), "注册验证码", result, null);
+            if(result.equals(emailInfo.getVacationcode())){
+                boolean sta_1 = Global.ju.execute("update from account set account_email = ? where account_name = ?",emailInfo.getAccount_email(),emailInfo.getAccount_name());
+                return "修改成功";
+            }
+            else
+                return "验证码错误";
+        }
+
     }
 
 }

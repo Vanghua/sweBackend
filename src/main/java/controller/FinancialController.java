@@ -1,33 +1,44 @@
 package controller;
 
 import FinancialSystem.trans.*;
+import org.assertj.core.util.Lists;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
 @RestController
-/**
- *
- */
 //实现财务账目的查询，返回ArrayList
 public class FinancialController {
     @PostMapping("api/Financial/query")
-    public ArrayList<Financialnfo> getFinancialInfo(@RequestBody Financialnfo Fin) {
+    public ArrayList<HashMap<String, Object>> getFinancialInfo(@RequestBody Financialnfo Fin) {
         ArrayList<Financialnfo> far = new ArrayList<Financialnfo>();
         //同时按照时间，金额，类型进行账单查询
         if(!Fin.getMoney().isEmpty() && !Fin.getTime_start().isEmpty() && !Fin.getTime_end().isEmpty() && !Fin.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from "+
                     "financialbill where money=? and date(time) between ? and ? and type = ?",
                     Integer.parseInt(Fin.getMoney()),Fin.getTime_start(),Fin.getTime_end(),Fin.getType());
-            for(int i=0;i<resultList.size();i++){
-                Financialnfo info = new Financialnfo((int) resultList.get(i).get("financeid"),(int)resultList.get(i).get("billid"),resultList.get(i).get("money").toString(),(Date) resultList.get(i).get("time"),(String) resultList.get(i).get("type"));
-                far.add(info);
+            ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+            int size = resultList.size();
+            int count = Fin.getNumber();
+            int absInt = -1;
+            if (size > count) {
+                absInt = Math.abs(size / count);
+                if (size - absInt * count > 0) {
+                    listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
+                }
+                for (int i = 1; i < absInt + 1; ++i) {
+                    listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
+                }
+            } else {
+                listAll.add(resultList);
             }
-            return far;
+            Collections.reverse(listAll);
+            return listAll.get(Fin.getCurrent_page() - 1);
 
         }
         //按照时间和账单类型进行账单查询
@@ -35,32 +46,68 @@ public class FinancialController {
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
                             "where date(time) between ? and ? and type = ?",
                     Fin.getTime_start(), Fin.getTime_end(), Fin.getType());
-            for (int i = 0; i < resultList.size(); i++) {
-                Financialnfo info = new Financialnfo((int) resultList.get(i).get("financeid"),(int) resultList.get(i).get("billid"), resultList.get(i).get("money").toString(), (Date) resultList.get(i).get("time"), (String) resultList.get(i).get("type"));
-                far.add(info);
+            ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+            int size = resultList.size();
+            int count = Fin.getNumber();
+            int absInt = -1;
+            if (size > count) {
+                absInt = Math.abs(size / count);
+                if (size - absInt * count > 0) {
+                    listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
+                }
+                for (int i = 1; i < absInt + 1; ++i) {
+                    listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
+                }
+            } else {
+                listAll.add(resultList);
             }
-            return far;
+            Collections.reverse(listAll);
+            return listAll.get(Fin.getCurrent_page() - 1);
         }
         //按照账单类型进行查询
         else if(Fin.getMoney().isEmpty() && Fin.getTime_start().isEmpty() && Fin.getTime_end().isEmpty() && !Fin.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
                             "where type = ?", Fin.getType());
-            for (int i = 0; i < resultList.size(); i++) {
-                Financialnfo info = new Financialnfo((int) resultList.get(i).get("financeid"),(int) resultList.get(i).get("billid"), resultList.get(i).get("money").toString(), (Date) resultList.get(i).get("time"), (String) resultList.get(i).get("type"));
-                far.add(info);
+            ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+            int size = resultList.size();
+            int count = Fin.getNumber();
+            int absInt = -1;
+            if (size > count) {
+                absInt = Math.abs(size / count);
+                if (size - absInt * count > 0) {
+                    listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
+                }
+                for (int i = 1; i < absInt + 1; ++i) {
+                    listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
+                }
+            } else {
+                listAll.add(resultList);
             }
-            return far;
+            Collections.reverse(listAll);
+            return listAll.get(Fin.getCurrent_page() - 1);
         }
         //按照金额和账单类型进行查询
         else if(!Fin.getMoney().isEmpty() && Fin.getTime_start().isEmpty() && Fin.getTime_end().isEmpty() && !Fin.getType().isEmpty()){
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
                             "where money = ? and type = ?",
                     Integer.parseInt(Fin.getMoney()), Fin.getType());
-            for (int i = 0; i < resultList.size(); i++) {
-                Financialnfo info = new Financialnfo((int) resultList.get(i).get("financeid"),(int) resultList.get(i).get("billid"), resultList.get(i).get("money").toString(), (Date) resultList.get(i).get("time"), (String) resultList.get(i).get("type"));
-                far.add(info);
+            ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+            int size = resultList.size();
+            int count = Fin.getNumber();
+            int absInt = -1;
+            if (size > count) {
+                absInt = Math.abs(size / count);
+                if (size - absInt * count > 0) {
+                    listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
+                }
+                for (int i = 1; i < absInt + 1; ++i) {
+                    listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
+                }
+            } else {
+                listAll.add(resultList);
             }
-            return far;
+            Collections.reverse(listAll);
+            return listAll.get(Fin.getCurrent_page() - 1);
 
         }
         //按照账单金额和时间进行查询
@@ -68,47 +115,124 @@ public class FinancialController {
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
                             "where money = ? and date(time) between ? and ?",
                     Integer.parseInt(Fin.getMoney()), Fin.getTime_start(),Fin.getTime_end());
-            for (int i = 0; i < resultList.size(); i++) {
-                Financialnfo info = new Financialnfo((int) resultList.get(i).get("financeid"),(int) resultList.get(i).get("billid"), resultList.get(i).get("money").toString(), (Date) resultList.get(i).get("time"), (String) resultList.get(i).get("type"));
-                far.add(info);
+            ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+            int size = resultList.size();
+            int count = Fin.getNumber();
+            int absInt = -1;
+            if (size > count) {
+                absInt = Math.abs(size / count);
+                if (size - absInt * count > 0) {
+                    listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
+                }
+                for (int i = 1; i < absInt + 1; ++i) {
+                    listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
+                }
+            } else {
+                listAll.add(resultList);
             }
-            return far;
+            Collections.reverse(listAll);
+            return listAll.get(Fin.getCurrent_page() - 1);
 
         }
         //按照账单金额进行账单查询
-        else if(!Fin.getMoney().isEmpty() && Fin.getTime_start().isEmpty() && Fin.getTime_end().isEmpty() && Fin.getType().isEmpty()){
+        else if(!Fin.getMoney().isEmpty() && Fin.getTime_start().isEmpty() && Fin.getTime_end().isEmpty() && Fin.getType().isEmpty()) {
             ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
                             "where money = ? ",
                     Integer.parseInt(Fin.getMoney()));
-            for (int i = 0; i < resultList.size(); i++) {
-                Financialnfo info = new Financialnfo((int) resultList.get(i).get("financeid"),(int) resultList.get(i).get("billid"), resultList.get(i).get("money").toString(), (Date) resultList.get(i).get("time"), (String) resultList.get(i).get("type"));
-                far.add(info);
+            ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+            int size = resultList.size();
+            int count = Fin.getNumber();
+            int absInt = -1;
+            if (size > count) {
+                absInt = Math.abs(size / count);
+                if (size - absInt * count > 0) {
+                    listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
+                }
+                for (int i = 1; i < absInt + 1; ++i) {
+                    listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
+                }
+            } else {
+                listAll.add(resultList);
             }
-            return far;
+            Collections.reverse(listAll);
+            return listAll.get(Fin.getCurrent_page() - 1);
 
-        }
-        //没有同时输入开始时间和截止时间
-        else if((Fin.getTime_start().isEmpty() && !Fin.getTime_end().isEmpty()) || (!Fin.getTime_start().isEmpty() && Fin.getTime_end().isEmpty())){
-            Financialnfo Info = new Financialnfo("请同时输入开始时间和截止时间");
-            far.add(Info);
-            return far;
         }
         //没有输入信息
         else {
-            Financialnfo Info = new Financialnfo("请输入查询信息");
-            far.add(Info);
-            return far;
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill ");
+            ArrayList<ArrayList<HashMap<String, Object>>> listAll = new ArrayList<>();
+            int size = resultList.size();
+            int count = Fin.getNumber();
+            int absInt = -1;
+            if (size > count) {
+                absInt = Math.abs(size / count);
+                if (size - absInt * count > 0) {
+                    listAll.add(Lists.newArrayList(resultList.subList(absInt * count, size)));
+                }
+                for (int i = 1; i < absInt + 1; ++i) {
+                    listAll.add(Lists.newArrayList(resultList.subList((i - 1) * count, i * count)));
+                }
+            } else {
+                listAll.add(resultList);
+            }
+            Collections.reverse(listAll);
+            return listAll.get(Fin.getCurrent_page() - 1);
 
         }
-//        String sql = "select * from financialbill where type=? ";
-//        ArrayList<HashMap<String, Object>> resultList = Global.ju.query(sql, Fin.getType());
-//
-//
-//        for(int i=0;i<resultList.size();i++){
-//            Financialnfo info = new Financialnfo((int)resultList.get(i).get("billid"),resultList.get(i).get("money").toString(),(String) resultList.get(i).get("time"),(String) resultList.get(i).get("type"));
-//            far.add(info);
-//        }
-//        return far;
+    }
+    //返回按照时间，金额，类型查询账单size
+    @PostMapping("api/Financial/TMTsize")
+    public int TMTsize(@RequestBody SizeInfo sizeInfo){
+        if(!sizeInfo.getMoney().isEmpty() && !sizeInfo.getTime_start().isEmpty() && !sizeInfo.getTime_end().isEmpty() && !sizeInfo.getType().isEmpty()){
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from "+
+                            "financialbill where money=? and date(time) between ? and ? and type = ?",
+                    Integer.parseInt(sizeInfo.getMoney()),sizeInfo.getTime_start(),sizeInfo.getTime_end(),sizeInfo.getType());
+            sizeInfo.setSize(resultList.size());
+            return sizeInfo.getSize();
+        }
+        else if(sizeInfo.getMoney().isEmpty() && !sizeInfo.getTime_start().isEmpty() && !sizeInfo.getTime_end().isEmpty() && !sizeInfo.getType().isEmpty()){
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
+                            "where date(time) between ? and ? and type = ?",
+                    sizeInfo.getTime_start(), sizeInfo.getTime_end(), sizeInfo.getType());
+            sizeInfo.setSize(resultList.size());
+            return sizeInfo.getSize();
+        }
+        else if(sizeInfo.getMoney().isEmpty() && sizeInfo.getTime_start().isEmpty() && sizeInfo.getTime_end().isEmpty() && !sizeInfo.getType().isEmpty()){
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
+                    "where type = ?", sizeInfo.getType());
+            sizeInfo.setSize(resultList.size());
+            return sizeInfo.getSize();
+        }
+        else if(!sizeInfo.getMoney().isEmpty() && sizeInfo.getTime_start().isEmpty() && sizeInfo.getTime_end().isEmpty() && !sizeInfo.getType().isEmpty()){
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
+                            "where money = ? and type = ?",
+                    Integer.parseInt(sizeInfo.getMoney()), sizeInfo.getType());
+            sizeInfo.setSize(resultList.size());
+            return sizeInfo.getSize();
+        }
+        else if(!sizeInfo.getMoney().isEmpty() && !sizeInfo.getTime_start().isEmpty() && !sizeInfo.getTime_end().isEmpty() && sizeInfo.getType().isEmpty()){
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
+                            "where money = ? and date(time) between ? and ?",
+                    Integer.parseInt(sizeInfo.getMoney()), sizeInfo.getTime_start(),sizeInfo.getTime_end());
+            sizeInfo.setSize(resultList.size());
+            return sizeInfo.getSize();
+
+        }
+        else if(!sizeInfo.getMoney().isEmpty() && sizeInfo.getTime_start().isEmpty() && sizeInfo.getTime_end().isEmpty() && sizeInfo.getType().isEmpty()){
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill " +
+                            "where money = ? ",
+                    Integer.parseInt(sizeInfo.getMoney()));
+            sizeInfo.setSize(resultList.size());
+            return sizeInfo.getSize();
+        }
+        else {
+            ArrayList<HashMap<String, Object>> resultList = Global.ju.query("select * from financialbill ");
+            sizeInfo.setSize(resultList.size());
+            return sizeInfo.getSize();
+        }
+
+
     }
 //实现添加员工工资信息
     @PostMapping("api/Financial/addsalary")
@@ -154,8 +278,6 @@ public class FinancialController {
 //实现采购物品的购买记录，同时添加该记录到账单中
     @PostMapping("api/Finacial/purchase")
     public String purchase(@RequestBody PurchaseInfo pur){
-//        Calendar calendar = Calendar.getInstance();
-//        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         boolean sta_purchase_1 = Global.ju.execute("insert into buybill(buydate,money) value(?,?)",pur.getTime(),pur.getMoney());
         if(sta_purchase_1 == true) {
             boolean sta_purchase_2 = Global.ju.execute("insert into buydatail(buybillid,buythingid,num) value((select max(id) from buybill),(select id from buything where name=?),?) ", pur.getName(), pur.getNum());

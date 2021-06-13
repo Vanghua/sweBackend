@@ -11,6 +11,8 @@ public class Financialnfo {
     private Date time;
     private String type;
     private String result;
+    private int number;
+    private int current_page;
     public Financialnfo(){
 
     }
@@ -89,5 +91,21 @@ public class Financialnfo {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int getCurrent_page() {
+        return current_page;
+    }
+
+    public void setCurrent_page(int current_page) {
+        this.current_page = current_page;
     }
 }
