@@ -478,7 +478,7 @@ public class OrdersController {
 	
 	
 	@PostMapping("api/orders/getCurrentOrders")
-	public QueryCurrentOrdersInfo[] getCurrentOrders(@RequestBody CommitQueryInfo commitQueryInfo) { // 获取用户所有的已完成信息,同样包括普通用户和管理员查询
+	public QueryCurrentOrdersInfo[] getCurrentOrders(@RequestBody CommitQueryInfo commitQueryInfo) { // 获取用户所有的进行中信息,同样包括普通用户和管理员查询
 		String sql = "select "
 				+ " orders.orders_id, orders_name, orders_status, cast(create_time as char) as create_time, "
 				+ " account_name, user_priority, good_priority, good_weight, orders_price, "
