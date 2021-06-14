@@ -302,8 +302,8 @@ public class WarehouseController {
     public ArrayList<HashMap<String, Object>> goodQueryByShelf(@RequestBody ShelfInfo shelfInfo) {
         String sql = "select good.* " +
                 "from storage left join good on storage_goodId = good_id " +
-                "where storage_shelfId = ?";
-        return Global.ju.query(sql, shelfInfo.getShelfId());
+                "where storage_shelfId = ? and storage_warehouseId = ?";
+        return Global.ju.query(sql, shelfInfo.getShelfId(), shelfInfo.getShelfWarehouseId());
     }
 
     // 入库顺序单
