@@ -136,7 +136,7 @@ public class WarehouseController {
     // 货架添加
     @PostMapping("/api/warehouse/addShelf")
     public String addShelf(@RequestBody ShelfInfo shelfInfo) {
-        if (Global.ju.exists("select * from shelf where shelf_id = ?", shelfInfo.getShelfId())) {
+        if (Global.ju.exists("select * from shelf where shelf_id = ? and shelf_warehouseId = ?", shelfInfo.getShelfId(), shelfInfo.getShelfWarehouseId())) {
             return "货架已存在";
         } else if (!Global.ju.exists("select * from warehouse where warehouse_id = ?", shelfInfo.getShelfWarehouseId())) {
             return "仓库不存在";
