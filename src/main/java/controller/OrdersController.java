@@ -502,7 +502,7 @@ public class OrdersController {
 			sql += " and orders.account_name = '" + commitQueryInfo.getQueryAccountName() + "'";
 		}
 		
-		sql += " order by orders.create_time desc";
+		sql += " order by orders.create_time asc";
 		
 		ArrayList<HashMap<String, Object>> resList = Global.ju.query(sql);
 		
