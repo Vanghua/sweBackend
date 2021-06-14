@@ -215,7 +215,7 @@ public class WarehouseController {
             num = goodInfo.getGoodNum();
             if (resultList.size() > 0) { // 找到可以直接存入货物的货架
                 shelf_id = (String) resultList.get(0).get("shelf_id");
-                Global.ju.execute("update shelf set shelf_storageNum = shelf_storageNum - ? where shelf_id = ?", goodInfo.getGoodNum(), shelf_id);
+                Global.ju.execute("update shelf set shelf_storageNum = shelf_storageNum - ? where shelf_id = ? and shelf_warehouseId = ?", goodInfo.getGoodNum(), shelf_id,warehouse_result);
                 Global.ju.execute("insert into storage values(default,?,?,?,?)", warehouse_result, goodInfo.getGoodId(), shelf_id, goodInfo.getGoodNum());
             } else {
                 sql = "select shelf_id,shelf_storageNum from shelf where shelf_warehouseId = ?";
