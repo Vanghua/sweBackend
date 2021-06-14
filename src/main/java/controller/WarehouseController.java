@@ -58,9 +58,15 @@ public class WarehouseController {
     // 仓库添加
     @PostMapping("/api/warehouse/addWarehouse")
     public String addwarehouse(@RequestBody WarehouseInfo warehouseInfo) {
+        ArrayList<HashMap<String,Object>> resultlist = Global.ju.query("select account_type as result from account where account_name = ?",warehouseInfo.getWarehouseManager());
+        String account_type = (String) resultlist.get(0).get("result");
         if (Global.ju.exists("select * from warehouse where warehouse_lng = ? and warehouse_lat = ?", warehouseInfo.getWarehouseLng(), warehouseInfo.getWarehouseLat())) {
             return "仓库已存在";
-        } else {
+        }
+        else if(!account_type.equals("warehouse")&&!account_type.equals("all")){
+            return "管理员类型错误";
+        }
+        else {
             Global.ju.execute("insert into warehouse values(default,?,?,?,?,?,default,?,?)",
                     warehouseInfo.getWarehouseType(),
                     warehouseInfo.getWarehhouseStoragenum(),
