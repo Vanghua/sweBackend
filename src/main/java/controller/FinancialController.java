@@ -249,8 +249,12 @@ public class FinancialController {
 //实现报销，添加报销记录到报销单数据库，同时在账单中添加该记录
     @PostMapping("api/Financial/expenses")
     public String expenses(@RequestBody ExpensesInfo expenses){
+
         boolean sta_exp = Global.ju.execute("insert into expense(invoice_num,proposer,proposer_id,assessor,money,time) value(?,?,?,?,?,?)",expenses.getInvoice_num(),expenses.getProposer(),expenses.getProposer_id(),expenses.getAssessor(),expenses.getMoney(),expenses.getTime());
-        boolean sta_bill = Global.ju.execute("insert into financialbill(billid,money,time,type) value((select max(expense_id) from expense),?,CURRENT_DATE,?)",expenses.getMoney(),"报销");
+        ArrayList<HashMap<String, Object>> resultlist = Global.ju.query("select max(expense_id) as result from expense");
+        String id = resultlist.get(0).get("result").toString();
+
+        boolean sta_bill = Global.ju.execute("insert into financialbill(billid,money,time,type) value(?,?,default,?)",id,expenses.getMoney(),"报销");
         if(sta_exp == true && sta_bill == true)
             return "报销成功";
         else
@@ -268,21 +272,28 @@ public class FinancialController {
      */
     @PostMapping("api/Financial/addgood")
     public String addgood(@RequestBody GoodsInfo good) {
-        String sql = "insert into buything(name, type,price) value(?,?,?)";
-        boolean status = Global.ju.execute(sql, good.getName(), good.getType(), good.getPrice());
-        if (status == true)
-            return "成功";
-        else
-            return "错误";
+        if(Global.ju.exists("select name from buything where name = ?",good.getName())) {
+            return "物品已存在";
+        }
+        else {
+            String sql = "insert into buything(name, type,price) value(?,?,?)";
+            boolean status = Global.ju.execute(sql, good.getName(), good.getType(), good.getPrice());
+            if (status == true)
+                return "成功";
+            else
+                return "错误";
+        }
     }
 //实现采购物品的购买记录，同时添加该记录到账单中
-    @PostMapping("api/Finacial/purchase")
+    @PostMapping("api/Financial/purchase")
     public String purchase(@RequestBody PurchaseInfo pur){
         boolean sta_purchase_1 = Global.ju.execute("insert into buybill(buydate,money) value(?,?)",pur.getTime(),pur.getMoney());
         if(sta_purchase_1 == true) {
             boolean sta_purchase_2 = Global.ju.execute("insert into buydatail(buybillid,buythingid,num) value((select max(id) from buybill),(select id from buything where name=?),?) ", pur.getName(), pur.getNum());
             if(sta_purchase_2 == true){
-                boolean sta_purchase_3 = Global.ju.execute("insert into financialbill(money,time,type) value(?,CURRENT_DATE,?)",pur.getMoney(),"采购物品");
+                ArrayList<HashMap<String, Object>> resultlist = Global.ju.query("select max(id) as result from buybill");
+                String id = resultlist.get(0).get("result").toString();
+                boolean sta_purchase_3 = Global.ju.execute("insert into financialbill(billid,money,time,type) value(?,?,default,?)",id,pur.getMoney(),"采购物品");
                 if(sta_purchase_3 == true)
                     return "生成购买记录成功";
                 else
@@ -307,7 +318,7 @@ public class FinancialController {
             boolean sta_type = Global.ju.execute("update payoff set time = ?,money = (select money from salary where type = ?)*"+
                     "(select day_num from checkingin where type = ?), received = '是' "+
                     "where payname_id = (select workerid from salary where type = ?)",pay.getTime(),pay.getType(),pay.getType(),pay.getType());
-            boolean sta_bill = Global.ju.execute("insert into financialbill(billid,money,time,type) value(-1,(select sum(money) from payoff where payname_id = (select workerid from salary where type = ?)),CURRENT_DATE,?)",pay.getType(),"工资发放");
+            boolean sta_bill = Global.ju.execute("insert into financialbill(billid,money,time,type) value('-1',(select sum(money) from payoff where payname_id = (select workerid from salary where type = ?)),default,?)",pay.getType(),"工资发放");
             if(sta_type == true && sta_bill == true)
                 return "工资发放成功";
             else
@@ -319,7 +330,7 @@ public class FinancialController {
             boolean sta_time = Global.ju.execute("update payoff set time = ?,money = (select money from salary where workerid = ?)*"+
                     "(select day_num from checkingin where id = ?), received = '是' "+
                     "where payname_id = ?",pay.getTime(),pay.getWorker_id(),pay.getWorker_id(),pay.getWorker_id());
-            boolean sta_bill = Global.ju.execute("insert into financialbill(billid,money,time,type) value(-1,(select money from payoff where payname_id = ?),CURRENT_DATE,?)",
+            boolean sta_bill = Global.ju.execute("insert into financialbill(billid,money,time,type) value('-1',(select money from payoff where payname_id = ?),default,?)",
                     pay.getWorker_id(),"工资发放");
             if(sta_bill == true && sta_time == true)
                 return "工资发放成功";
