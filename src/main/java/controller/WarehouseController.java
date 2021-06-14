@@ -77,7 +77,7 @@ public class WarehouseController {
     @PostMapping("/api/warehouse/warehouseDelete")
     public String warehouseDelete(@RequestBody String warehouseId) {
         int storageNum = -1;
-        if (!Global.ju.exists("select * from shelf where warehouse_id = ?", warehouseId)) {
+        if (!Global.ju.exists("select * from warehouse where warehouse_id = ?", warehouseId)) {
             return "仓库不存在";
         } else {
             if (Global.ju.exists("select * from storage where storage_warehouseId = ?", warehouseId)) {
@@ -126,6 +126,7 @@ public class WarehouseController {
     // 特定仓库查询
     @PostMapping("/api/warehouse/warehouseQuery")
     public ArrayList<HashMap<String, Object>> warehouseQuery(@RequestBody WarehouseInfo warehouseInfo) {
+        System.out.println(warehouseInfo.getWarehouseId());
         String sql = "select * from warehouse where warehouse_id = ?";
         ArrayList<HashMap<String, Object>> resultList;
         resultList = Global.ju.query(sql, warehouseInfo.getWarehouseId());
@@ -135,7 +136,7 @@ public class WarehouseController {
     // 货架添加
     @PostMapping("/api/warehouse/addShelf")
     public String addShelf(@RequestBody ShelfInfo shelfInfo) {
-        if (Global.ju.exists("select * from shelf where shelf_id = ?", shelfInfo.getShelfId())) {
+        if (Global.ju.exists("select * from shelf where shelf_id = ? and shelf_warehouseId = ?", shelfInfo.getShelfId(), shelfInfo.getShelfWarehouseId())) {
             return "货架已存在";
         } else if (!Global.ju.exists("select * from warehouse where warehouse_id = ?", shelfInfo.getShelfWarehouseId())) {
             return "仓库不存在";
@@ -284,11 +285,11 @@ public class WarehouseController {
 
     // 按照地址查找仓库
     @PostMapping("/api/warehouse/warehouseQueryAddress")
-    public HashMap<String, Object> warehouseQueryAddress(@RequestBody WarehouseInfo warehouseInfo) {
+    public ArrayList<HashMap<String, Object>> warehouseQueryAddress(@RequestBody WarehouseInfo warehouseInfo) {
         String sql = "select * from warehouse where warehouse_address like ?";
         String s = '%'+warehouseInfo.getWarehouseAddress()+'%';
         if(Global.ju.exists("select * from warehouse")){
-            return Global.ju.query(sql,s).get(0);
+            return Global.ju.query(sql,s);
         }
         return null;
     }
@@ -297,9 +298,9 @@ public class WarehouseController {
     @PostMapping("/api/warehouse/goodQueryByShelf")
     public ArrayList<HashMap<String, Object>> goodQueryByShelf(@RequestBody ShelfInfo shelfInfo) {
         String sql = "select good.* " +
-                "from storage left join good on storage_goodId = good_id" +
-                "where storage_shelfId = ?";
-        return Global.ju.query(sql, shelfInfo.getShelfId());
+                "from storage left join good on storage_goodId = good_id " +
+                "where storage_shelfId = ? and storage_warehouseId = ?";
+        return Global.ju.query(sql, shelfInfo.getShelfId(), shelfInfo.getShelfWarehouseId());
     }
 
     // 出库顺序表
