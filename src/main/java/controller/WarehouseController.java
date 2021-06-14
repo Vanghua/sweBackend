@@ -287,18 +287,18 @@ public class WarehouseController {
 
     // 按照地址查找仓库
     @PostMapping("/api/warehouse/warehouseQueryAddress")
-    public HashMap<String, Object> warehouseQueryAddress(@RequestBody String warehouseAddress) {
-        String sql = "select * from warehouse where warehouse = ?";
-        return Global.ju.query(sql, warehouseAddress).get(0);
+    public HashMap<String, Object> warehouseQueryAddress(@RequestBody WarehouseInfo warehouseInfo) {
+        String sql = "select * from warehouse where warehouse_address = ?";
+        return Global.ju.query(sql, warehouseInfo.getWarehouseAddress()).get(0);
     }
 
     // 查找该货架存储货物
     @PostMapping("/api/warehouse/goodQueryByShelf")
-    public ArrayList<HashMap<String, Object>> goodQueryByShelf(@RequestBody String shelfId) {
+    public ArrayList<HashMap<String, Object>> goodQueryByShelf(@RequestBody ShelfInfo shelfInfo) {
         String sql = "select good.* " +
                 "from storage left join good on storage_goodId = good_id" +
                 "where storage_shelfId = ?";
-        return Global.ju.query(sql, shelfId);
+        return Global.ju.query(sql, shelfInfo.getShelfId());
     }
 
     // 入库顺序单
