@@ -423,9 +423,7 @@ public class OrdersController {
 				+ " sender_name, sender_phone, sender_address, sender_detail_address, "
 				+ " receiver_name, receiver_phone, receiver_address, receiver_detail_address, "
 				+ " cast(success_time as char) as success_time "
-				
-				+ " from success_orders left join orders on success_orders.orders_id = orders.orders_id "
-				+ " where orders_status = '待支付' ";
+				+ " from success_orders left join orders on success_orders.orders_id = orders.orders_id ";
 		
 		if(commitQueryInfo.getQueryFilter().equals("name")) { // 按照名称模糊查询
 			sql += " and orders_name like '" + commitQueryInfo.getQueryFilterContent() + "%'";
