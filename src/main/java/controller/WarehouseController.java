@@ -67,14 +67,17 @@ public class WarehouseController {
             return "管理员类型错误";
         }
         else {
-            Global.ju.execute("insert into warehouse values(default,?,?,?,?,?,default,?,?)",
+            Global.ju.execute("insert into warehouse values(default,?,?,?,?,?,default,?,?,?,?,?)",
                     warehouseInfo.getWarehouseType(),
                     warehouseInfo.getWarehhouseStoragenum(),
                     warehouseInfo.getWarehouseAddress(),
                     warehouseInfo.getWarehouseManager(),
                     warehouseInfo.getWarehouseManagerTel(),
                     warehouseInfo.getWarehouseLng(),
-                    warehouseInfo.getWarehouseLat());
+                    warehouseInfo.getWarehouseLat(),
+                    warehouseInfo.getWarehouseProvince(),
+                    warehouseInfo.getWarehouseCity(),
+                    warehouseInfo.getWarehouseDistrict());
             return "仓库已成功添加";
         }
     }
