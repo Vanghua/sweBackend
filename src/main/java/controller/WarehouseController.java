@@ -126,6 +126,7 @@ public class WarehouseController {
     // 特定仓库查询
     @PostMapping("/api/warehouse/warehouseQuery")
     public ArrayList<HashMap<String, Object>> warehouseQuery(@RequestBody WarehouseInfo warehouseInfo) {
+        System.out.println(warehouseInfo.getWarehouseId());
         String sql = "select * from warehouse where warehouse_id = ?";
         ArrayList<HashMap<String, Object>> resultList;
         resultList = Global.ju.query(sql, warehouseInfo.getWarehouseId());
@@ -287,11 +288,11 @@ public class WarehouseController {
 
     // 按照地址查找仓库
     @PostMapping("/api/warehouse/warehouseQueryAddress")
-    public HashMap<String, Object> warehouseQueryAddress(@RequestBody WarehouseInfo warehouseInfo) {
+    public ArrayList<HashMap<String, Object>> warehouseQueryAddress(@RequestBody WarehouseInfo warehouseInfo) {
         String sql = "select * from warehouse where warehouse_address like ?";
         String s = '%'+warehouseInfo.getWarehouseAddress()+'%';
         if(Global.ju.exists("select * from warehouse")){
-            return Global.ju.query(sql,s).get(0);
+            return Global.ju.query(sql,s);
         }
         return null;
     }
