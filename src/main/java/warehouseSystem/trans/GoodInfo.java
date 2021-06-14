@@ -1,13 +1,6 @@
 package warehouseSystem.trans;
 
 public class GoodInfo {
-    /*
-        货物号
-        货物名
-        货物数量
-        货物三段码信息
-        货物种类（与优先状态相匹配）
-     */
     private int goodId;
     private String goodName;
     private int goodNum;

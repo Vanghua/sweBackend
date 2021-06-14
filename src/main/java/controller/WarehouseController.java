@@ -284,4 +284,39 @@ public class WarehouseController {
             return "出库办理完成";
         }
     }
+
+    // 按照地址查找仓库
+    @PostMapping("/api/warehouse/warehouseQueryAddress")
+    public HashMap<String, Object> warehouseQueryAddress(@RequestBody String warehouseAddress) {
+        String sql = "select * from warehouse where warehouse = ?";
+        return Global.ju.query(sql, warehouseAddress).get(0);
+    }
+
+    // 查找该货架存储货物
+    @PostMapping("/api/warehouse/goodQueryByShelf")
+    public ArrayList<HashMap<String, Object>> goodQueryByShelf(@RequestBody String shelfId) {
+        String sql = "select good.* " +
+                "from storage left join good on storage_goodId = good_id" +
+                "where storage_shelfId = ?";
+        return Global.ju.query(sql, shelfId);
+    }
+
+    // 入库顺序单
+    @PostMapping("/api/warehouse/warehouseSheet")
+    public ArrayList<HashMap<String, Object>> warehouseSheet() {
+        String sql = "select good.good_id,good.good_name " +
+                "from good left join orders on good.orders_id = orders.orders_id " +
+                "order by (good.priority * 0.5 + datediff(now(),create_time)*0.5) desc";
+        return Global.ju.query(sql);
+    }
+
+    // 出库顺序表
+    @PostMapping("/api/warehouse/exwarehouseSheet")
+    public ArrayList<HashMap<String, Object>> exwarehouseSheet() {
+        String sql = "select good.good_id,good.good_name " +
+                "from good left join storage on good.orders_id = orders.orders_id " +
+                "lefet join warehouselist on storage_id = list_storageId " +
+                "order by (good.priority * 0.5 + datediff(now(),list_warehouseTime)*0.5) desc";
+        return Global.ju.query(sql);
+    }
 }
