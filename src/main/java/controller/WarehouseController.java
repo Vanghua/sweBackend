@@ -288,8 +288,11 @@ public class WarehouseController {
     // 按照地址查找仓库
     @PostMapping("/api/warehouse/warehouseQueryAddress")
     public HashMap<String, Object> warehouseQueryAddress(@RequestBody WarehouseInfo warehouseInfo) {
-        String sql = "select * from warehouse where warehouse_address = ?";
-        return Global.ju.query(sql, warehouseInfo.getWarehouseAddress()).get(0);
+        String sql = "select * from warehouse where warehouse_address like '%?%'";
+        if(Global.ju.exists("select * from warehouse")){
+            return Global.ju.query(sql,warehouseInfo.getWarehouseAddress()).get(0);
+        }
+        return null;
     }
 
     // 查找该货架存储货物
