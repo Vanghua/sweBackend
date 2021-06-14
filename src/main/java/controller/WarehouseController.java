@@ -78,6 +78,7 @@ public class WarehouseController {
                     warehouseInfo.getWarehouseProvince(),
                     warehouseInfo.getWarehouseCity(),
                     warehouseInfo.getWarehouseDistrict());
+
             return "仓库已成功添加";
         }
     }
