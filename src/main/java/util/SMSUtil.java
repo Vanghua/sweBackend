@@ -16,15 +16,15 @@ public class SMSUtil {
 		this.key = key;
 	}
 	
-	public void sendSMS(String to, String position) {
+	public void sendSMS(String targetPhoneNumber, String receiverName, String ordersName, String address) {
 		HttpClient client = new HttpClient();
 		PostMethod post = new PostMethod("http://gbk.api.smschinese.cn");
 		post.addRequestHeader("Content-Type","application/x-www-form-urlencoded;charset=gbk");//在头文件中设置转码
 		NameValuePair[] data ={ 
 				new NameValuePair("Uid", id),
 				new NameValuePair("Key", key),
-				new NameValuePair("smsMob",  to),
-				new NameValuePair("smsText", "您有新的快递到达 " + position + "，请及时取件！")
+				new NameValuePair("smsMob",  targetPhoneNumber),
+				new NameValuePair("smsText", "尊敬的" + receiverName + "，您有新的快件" + ordersName + "到达" + address + "，请及时取件！")
 		};
 		post.setRequestBody(data);
 
