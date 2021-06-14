@@ -4,11 +4,11 @@ public class GoodsInfo {
     private int id;
     private String name;
     private String type;
-    private int price;
+    private double price;
     public GoodsInfo(){
 
     }
-    public GoodsInfo(int id,String name,String type,int price){
+    public GoodsInfo(int id,String name,String type,double price){
         this.id = id;
         this.name = name;
         this.type = type;
@@ -39,11 +39,11 @@ public class GoodsInfo {
         this.name = name;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 }
