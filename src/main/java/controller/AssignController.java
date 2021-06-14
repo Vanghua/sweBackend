@@ -26,8 +26,8 @@ public class AssignController {
         sql = "select * from trans where account_name = ?";
         resultList = Global.ju.query(sql, trans.getAccountName());
         if(resultList.size() != 0) {
-            sql = "update trans set warehouse_id = ? where account_name = ?";
-            Global.ju.execute(sql, trans.getWarehouseId(), trans.getAccountName());
+            sql = "update trans set warehouse_id = ?, trans_weight = ? where account_name = ?";
+            Global.ju.execute(sql, trans.getWarehouseId(), trans.getTransWeight(), trans.getAccountName());
             return "成功";
         }
 
@@ -39,14 +39,15 @@ public class AssignController {
 
     // 运输员信息获取
     @PostMapping("/api/assign/getTransInfo")
-    public int getTransInfo(@RequestBody Trans trans) {
+    public HashMap<String, Object> getTransInfo(@RequestBody Trans trans) {
         // 查询运输员是否存在
         String sql = "select * from trans where account_name = ?";
         ArrayList<HashMap<String, Object>> resultList;
         resultList = Global.ju.query("select * from trans where account_name = ?", trans.getAccountName());
         if(resultList.size() == 0)
-            return 0;
-        else
-            return (int)resultList.get(0).get("warehouse_id");
+            return null;
+        else {
+            return resultList.get(0);
+        }
     }
 }
