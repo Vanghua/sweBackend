@@ -51,7 +51,5 @@ public class Global {
 	
 	/* demo
 	 *  目前这个接口只能用于收到快递的提示，具体请询问 【朱胤璘】
-		SMSUtil t = new SMSUtil("popo1234", "d41d8cd98f00b204e980");
-		t.sendSMS("17786044027", "山东大学威海");
 	 */
 }
