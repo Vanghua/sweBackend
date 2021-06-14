@@ -7,6 +7,7 @@ public class GoodInfo {
     private int priority;
     private String managerId;
     private String orderId;
+    private WarehouseInfo warehouseInfo;
 
     public GoodInfo() {
     }
@@ -64,5 +65,13 @@ public class GoodInfo {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public WarehouseInfo getWarehouseInfo() {
+        return warehouseInfo;
+    }
+
+    public void setWarehouseInfo(WarehouseInfo warehouseInfo) {
+        this.warehouseInfo = warehouseInfo;
     }
 }
