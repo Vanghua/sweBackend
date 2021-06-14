@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import util.JdbcUtilV2;
 import util.MailUtil;
+import util.SMSUtil;
 
 public class Global {
 	// database configuration
@@ -42,4 +43,15 @@ public class Global {
 		goodPriorityDict.put("贵重物品", 5);
 		goodPriorityDict.put("其它", 3);
 	}
+	
+	// SMS configuration
+	public static String Uid = "popo1234";
+	public static String SMSkey = "d41d8cd98f00b204e980";
+	public static SMSUtil su = new SMSUtil(Uid, SMSkey);
+	
+	/* demo
+	 *  目前这个接口只能用于收到快递的提示，具体请询问 【朱胤璘】
+		SMSUtil t = new SMSUtil("popo1234", "d41d8cd98f00b204e980");
+		t.sendSMS("17786044027", "山东大学威海");
+	 */
 }
