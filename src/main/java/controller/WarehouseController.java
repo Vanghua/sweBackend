@@ -77,7 +77,7 @@ public class WarehouseController {
     @PostMapping("/api/warehouse/warehouseDelete")
     public String warehouseDelete(@RequestBody String warehouseId) {
         int storageNum = -1;
-        if (!Global.ju.exists("select * from shelf where warehouse_id = ?", warehouseId)) {
+        if (!Global.ju.exists("select * from warehouse where warehouse_id = ?", warehouseId)) {
             return "仓库不存在";
         } else {
             if (Global.ju.exists("select * from storage where storage_warehouseId = ?", warehouseId)) {
@@ -301,7 +301,7 @@ public class WarehouseController {
     @PostMapping("/api/warehouse/goodQueryByShelf")
     public ArrayList<HashMap<String, Object>> goodQueryByShelf(@RequestBody ShelfInfo shelfInfo) {
         String sql = "select good.* " +
-                "from storage left join good on storage_goodId = good_id" +
+                "from storage left join good on storage_goodId = good_id " +
                 "where storage_shelfId = ?";
         return Global.ju.query(sql, shelfInfo.getShelfId());
     }
