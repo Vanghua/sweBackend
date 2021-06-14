@@ -305,11 +305,41 @@ public class WarehouseController {
 
     // 出库顺序表
     @PostMapping("/api/warehouse/exwarehouseSheet")
-    public ArrayList<HashMap<String, Object>> exwarehouseSheet() {
+    public ArrayList<HashMap<String, Object>> exwarehouseSheet(@RequestBody WarehouseInfo warehouseInfo) {
+        ArrayList<HashMap<String, Object>> totalIdList = Global.ju.query(
+                "select orders_id " +
+                        " from orders_position " +
+                        "where warehouse_address = ?",
+                warehouseInfo.getWarehouseAddress());
+
+        ArrayList<String> answer = new ArrayList<>();
+
+        for (HashMap<String, Object> stringObjectHashMap : totalIdList) {
+            String currentId = (String) stringObjectHashMap.get("orders_id");
+            String[] totalWarehouseAddress = ((String)
+                    Global.ju.query("select route " +
+                            "from orders_route " +
+                            "where orders_id = ?", currentId).get(0).get("route")).split("\\|");
+
+            int totalWarehouseNum = totalWarehouseAddress.length;
+
+            for (int j = 0; j < totalWarehouseNum; ++j) {
+                if (totalWarehouseAddress[j].equals(warehouseInfo.getWarehouseAddress()) &&
+                        totalWarehouseAddress[j + 1].equals(warehouseInfo.getWarehouseToAddress())
+                ) {
+                    // warning: 如果是最后一站，会越界
+                    answer.add(currentId);
+                    break;
+                }
+            }
+        }
         String sql = "select good.good_id,good.good_name " +
-                "from good left join storage on good.orders_id = orders.orders_id " +
-                "lefet join warehouselist on storage_id = list_storageId " +
-                "order by (good.priority * 0.5 + datediff(now(),list_warehouseTime)*0.5) desc";
-        return Global.ju.query(sql);
+        "from good left join storage on good.orders_id = orders.orders_id " +
+        "lefet join warehouselist on storage_id = list_storageId " +
+        "where good.orders_id in ? "+
+        "order by (good.priority * 0.5 + datediff(now(),list_warehouseTime)*0.5) desc";
+        ArrayList<HashMap<String,Object>>list = Global.ju.query(sql,answer);
+        return list;
     }
+
 }

@@ -15,11 +15,15 @@ public class WarehouseInfo {
     private String warehouseCreationtime;
     private String warehouseLng;
     private String warehouseLat;
+    private String warehouseProvince;
+    private String warehouseCity;
+    private String warehouseDistrict;
+    private String warehouseToAddress;
 
     public WarehouseInfo() {
     }
 
-    public WarehouseInfo(int warehouseId, int warehouseType, int warehhouseStoragenum, String warehouseAddress, String warehouseManager, String warehouseManagerTel, String warehouseCreationtime, String warehouseLng, String warehouseLat) {
+    public WarehouseInfo(int warehouseId, int warehouseType, int warehhouseStoragenum, String warehouseAddress, String warehouseManager, String warehouseManagerTel, String warehouseCreationtime, String warehouseLng, String warehouseLat, String warehouseProvince, String warehouseCity, String warehouseDistrict) {
         this.warehouseId = warehouseId;
         this.warehouseType = warehouseType;
         this.warehhouseStoragenum = warehhouseStoragenum;
@@ -29,6 +33,9 @@ public class WarehouseInfo {
         this.warehouseCreationtime = warehouseCreationtime;
         this.warehouseLng = warehouseLng;
         this.warehouseLat = warehouseLat;
+        this.warehouseProvince = warehouseProvince;
+        this.warehouseCity = warehouseCity;
+        this.warehouseDistrict = warehouseDistrict;
     }
 
     public int getWarehouseId() {
@@ -103,4 +110,35 @@ public class WarehouseInfo {
         this.warehouseLat = warehouseLat;
     }
 
+    public String getWarehouseProvince() {
+        return warehouseProvince;
+    }
+
+    public void setWarehouseProvince(String warehouseProvince) {
+        this.warehouseProvince = warehouseProvince;
+    }
+
+    public String getWarehouseCity() {
+        return warehouseCity;
+    }
+
+    public void setWarehouseCity(String warehouseCity) {
+        this.warehouseCity = warehouseCity;
+    }
+
+    public String getWarehouseDistrict() {
+        return warehouseDistrict;
+    }
+
+    public void setWarehouseDistrict(String warehouseDistrict) {
+        this.warehouseDistrict = warehouseDistrict;
+    }
+
+    public String getWarehouseToAddress() {
+        return warehouseToAddress;
+    }
+
+    public void setWarehouseToAddress(String warehouseToAddress) {
+        this.warehouseToAddress = warehouseToAddress;
+    }
 }
