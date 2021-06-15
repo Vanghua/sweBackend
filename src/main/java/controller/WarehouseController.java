@@ -153,6 +153,9 @@ public class WarehouseController {
                     shelfInfo.getShelfId(),
                     shelfInfo.getShelfWarehouseId(),
                     shelfInfo.getShelfStorageNum());
+
+            Global.ju.execute("update warehouse set warehouse_storagenum = warehouse_storagenum + ? where warehouse_id = ?",
+                    shelfInfo.getShelfStorageNum(),shelfInfo.getShelfWarehouseId());
             return "货架已成功添加";
         }
     }
