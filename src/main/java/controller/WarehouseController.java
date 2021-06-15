@@ -365,22 +365,25 @@ public class WarehouseController {
             }
 
         }
-        String sql = "SELECT good.* FROM `good` LEFT JOIN `storage` on `good_id` = `storage_goodId` LEFT JOIN `warehouselist`on `warehouselist`.`list_storageId`  = `storage_id` order by (good.priority * 0.5 + datediff(now(),list_warehouseTime)*0.5) desc";
-        ArrayList<HashMap<String, Object>> list = Global.ju.query(sql);
-        int size = answer.size();
-        Boolean flag = false;
 
-        for (HashMap<String, Object> o : list) {
-            flag = false;
-            for (String s : answer) {
-                if (o.get("orders_id").equals(s)) {
-                    flag = true;
+        // 待优化
+        String sql = "SELECT `good`.* " +
+                "FROM `warehouselist` LEFT JOIN `storage` on `warehouselist`.`list_storageId` = `storage_id` " +
+                "LEFT JOIN `good`on  `good`.`good_id` = `storage_goodId` " +
+                "ORDER BY ( `good`.`priority`*0.5 + datediff(now(), `list_warehouseTime` )*0.5) desc";
+
+        ArrayList<HashMap<String, Object>> list = Global.ju.query(sql);
+        ArrayList<HashMap<String,Object>> res = new ArrayList<>();
+
+        for(int i = 0; i < list.size(); ++ i){
+            for(int j = 0;j < answer.size(); ++ j) {
+                if((list.get(i).get("orders_id").toString().equals(answer.get(j)))){
+                    res.add(list.get(i));
                     break;
                 }
             }
-            if (!flag) list.remove(o);
         }
-        return list;
+        return res;
     }
     // 根据省份查询仓库
     @PostMapping("/api/warehouse/warehouseProvince")
