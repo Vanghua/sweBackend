@@ -23,6 +23,7 @@ import ordersSystem.trans.QueryFreqAddressInfo;
 import ordersSystem.trans.QueryOrdersInfo;
 import ordersSystem.trans.QuerySuccessOrdersInfo;
 import ordersSystem.trans.QueryWaitPurchaseOrdersInfo;
+import warehouseSystem.trans.GoodInfo;
 @RestController
 public class OrdersController {
 
@@ -580,6 +581,123 @@ public class OrdersController {
 		}
 		
 		return res;
+	}
+	
+	
+	@PostMapping("api/orders/cancleOrders")
+	public String CancleOrders(@RequestBody CancleOrdersInfo cancleOrdersInfo) {
+		ArrayList<HashMap<String, Object>> resList = 
+				Global.ju.query("select orders_status "
+				+ " from orders "
+				+ " where orders_id = ?", cancleOrdersInfo.getOrdersId());
+		
+		if(resList.isEmpty()) {
+			return "不存在";
+		}else {
+			String ordersStatus = (String) resList.get(0).get("orders_status");
+			
+			if(ordersStatus.equals("待支付")) {
+				Global.ju.execute("update orders "
+						+ "set orders_status = ? "
+						+ "where orders_id = ?", 
+						"取消", 
+						cancleOrdersInfo.getOrdersId());
+				
+				Global.ju.execute("insert into "
+						+ " cancle_orders (orders_id, cancle_reason) "
+						+ "values(?,?) ", 
+						cancleOrdersInfo.getOrdersId(), 
+						cancleOrdersInfo.getCancleReason());
+				
+				return "成功";
+			
+			}else if(ordersStatus.equals("进行中")){
+				String[] totalAddress = 
+						((String) Global.ju.query("select route "
+								+ " from orders_route "
+								+ "where orders_id = ?", 
+								cancleOrdersInfo.getOrdersId()).get(0).get("route")
+						).split("\\|");
+				
+				if(totalAddress[0].equals("")) {
+					// 退款
+					Double returnMoney = 
+							(Double) 
+							Global.ju.query("select orders_price "
+									+ " from orders "
+									+ " where orders_id = ?", 
+									cancleOrdersInfo.getOrdersId()).get(0).get("orders_price");
+					
+					Global.ju.execute("update orders "
+							+ "set orders_status = ? "
+							+ "where orders_id = ?", 
+							"取消", 
+							cancleOrdersInfo.getOrdersId());
+					
+					Global.ju.execute("insert into "
+							+ " cancle_orders (orders_id, cancle_reason) "
+							+ "values(?,?) ", 
+							cancleOrdersInfo.getOrdersId(), 
+							cancleOrdersInfo.getCancleReason());
+					
+					Global.ju.execute("delete from orders_route where orders_id = ?", cancleOrdersInfo.getOrdersId());
+					
+					return String.valueOf(0.9 * returnMoney);
+				}else {
+					
+					String currentAddress = (String) Global.ju.query("select warehouse_address "
+							+ " from orders_position "
+							+ " where orders_id = ?", 
+							cancleOrdersInfo.getOrdersId()).get(0).get("warehouse_address");
+					
+					if(currentAddress.equals(totalAddress[0])) {
+						// 出库
+						String managerId = (String)Global.ju.query("select warehouse_managerId as result "
+								+ "from warehouse "
+								+ "where warehouse_address = ?",
+								currentAddress).get(0).get("result");
+						
+						GoodInfo goodInfo = new GoodInfo();
+						goodInfo.setOrderId(cancleOrdersInfo.getOrdersId());
+						goodInfo.setManagerId(managerId);
+						
+						WarehouseController.tmpFunction(goodInfo);
+						
+						// 退款
+						Double returnMoney = 
+								(Double) 
+								Global.ju.query("select orders_price "
+										+ " from orders "
+										+ " where orders_id = ?", 
+										cancleOrdersInfo.getOrdersId()).get(0).get("orders_price");
+						
+						Global.ju.execute("update orders "
+								+ "set orders_status = ? "
+								+ "where orders_id = ?", 
+								"取消", 
+								cancleOrdersInfo.getOrdersId());
+						
+						Global.ju.execute("insert into "
+								+ " cancle_orders (orders_id, cancle_reason) "
+								+ "values(?,?) ", 
+								cancleOrdersInfo.getOrdersId(), 
+								cancleOrdersInfo.getCancleReason());
+						
+						
+						Global.ju.execute("delete from orders_route where orders_id = ?", cancleOrdersInfo.getOrdersId());
+						
+						
+						return String.valueOf(0.8 * returnMoney);
+					}else {
+						return "禁止";
+					}
+				}
+			}else {
+				return "禁止";
+			}
+		}
+		
+
 	}
 }
 	

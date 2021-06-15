@@ -281,7 +281,12 @@ public class WarehouseController {
     @PostMapping("/api/warehouse/exwarehousing")
     public String exwarehousing(@RequestBody GoodInfo goodInfo) {
         //写入出库记录，删除存储细节，更新仓库、货架存位
-        int warehouse_id = -1;
+        return tmpFunction(goodInfo);
+    }
+    
+    // 不是@Request
+    public static String tmpFunction(GoodInfo goodInfo) {
+    	int warehouse_id = -1;
         String shelf_id = "";
         int num;
         String sql = "";
@@ -314,7 +319,6 @@ public class WarehouseController {
             return "订单信息输入错误";
         }
     }
-
     // 按照地址查找仓库
     @PostMapping("/api/warehouse/warehouseQueryAddress")
     public ArrayList<HashMap<String, Object>> warehouseQueryAddress(@RequestBody WarehouseInfo warehouseInfo) {
