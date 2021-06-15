@@ -134,7 +134,6 @@ public class WarehouseController {
     // 特定仓库查询
     @PostMapping("/api/warehouse/warehouseQuery")
     public ArrayList<HashMap<String, Object>> warehouseQuery(@RequestBody WarehouseInfo warehouseInfo) {
-        System.out.println(warehouseInfo.getWarehouseId());
         String sql = "select * from warehouse where warehouse_id = ?";
         ArrayList<HashMap<String, Object>> resultList;
         resultList = Global.ju.query(sql, warehouseInfo.getWarehouseId());
@@ -369,7 +368,6 @@ public class WarehouseController {
         String sql = "SELECT good.* FROM `good` LEFT JOIN `storage` on `good_id` = `storage_goodId` LEFT JOIN `warehouselist`on `warehouselist`.`list_storageId`  = `storage_id` order by (good.priority * 0.5 + datediff(now(),list_warehouseTime)*0.5) desc";
         ArrayList<HashMap<String, Object>> list = Global.ju.query(sql);
         int size = answer.size();
-        System.out.println(size);
         Boolean flag = false;
 
         for (HashMap<String, Object> o : list) {
@@ -441,12 +439,19 @@ public class WarehouseController {
     // 最优路径
     public void getAssign(OrdersIdInfo ordersIdInfo) {
         ArrayList<HashMap<String, Object>> resList =
-                Global.ju.query("select sender_address, receiver_address "
+                Global.ju.query("select sender_address, receiver_address, " +
+                        " cast(receiver_lat as double) as receiver_lat," +
+                        " cast(receiver_lng as double) as receiver_lng "
                         + " from orders "
                         + " where orders_id = ?", ordersIdInfo.getOrdersId());
 
         String[] formatSenderAddress = ((String) resList.get(0).get("sender_address")).split("\\|");
         String[] formatReceiverAddress = ((String) resList.get(0).get("receiver_address")).split("\\|");
+
+        // 获取收件人的经纬度
+        Double receiverLat = (Double) resList.get(0).get("receiver_lat");
+        Double receiverLng = (Double) resList.get(0).get("receiver_lng");
+
 
         Double fromLng = 0.0, fromLat = 0.0, toLng = 0.0, toLat = 0.0;
 
@@ -463,22 +468,22 @@ public class WarehouseController {
         fromLat = (Double) currentPositionList.get(0).get("warehouse_lat");
 
         // 找到收件人的所在的市内 离 收件地址最近的接收站
+        // 查询接收站时应该限定仓库级别为1--樊华修改
         ArrayList<HashMap<String, Object>> totalPossibleWareHouse =
                 Global.ju.query("select warehouse_address, " +
                         " cast(warehouse_lng as double) as warehouse_lng, " +
                         " cast(warehouse_lat as double) as warehouse_lat "
                         + " from warehouse "
-                        + " where warehouse_city = ?", formatReceiverAddress[1]);
+                        + " where warehouse_city = ? and warehouse_type = 1", formatReceiverAddress[1]);
 
         int targetIndex = 0;
-        double minDistance = 1000000000.0;
+        double minDistance = Double.MAX_VALUE;
 
         for (int i = 0; i < totalPossibleWareHouse.size(); ++i) {
             toLng = (Double) totalPossibleWareHouse.get(i).get("warehouse_lng");
             toLat = (Double) totalPossibleWareHouse.get(i).get("warehouse_lat");
 
-            double curDis = Global.getDistance(fromLat, fromLng, toLat, toLng);
-
+            double curDis = Global.getDistance(receiverLat, receiverLng, toLat, toLng);
             if (curDis < minDistance) {
                 targetIndex = i;
                 minDistance = curDis;
@@ -503,8 +508,8 @@ public class WarehouseController {
 
                 int targetLEVEL2Index = 0;
 
+                minDistance = 1000000000.0;
                 for (int i = 0; i < totalPossibleWareHouse_LEVEL2.size(); ++i) {
-                    minDistance = 1000000000.0;
                     Double curLng = (Double) totalPossibleWareHouse_LEVEL2.get(i).get("warehouse_lng");
                     Double curLat = (Double) totalPossibleWareHouse_LEVEL2.get(i).get("warehouse_lat");
 
@@ -522,7 +527,7 @@ public class WarehouseController {
                 // 路线安排完毕
                 String resultRoute = fromWarehouseAddress + "|" + LEVEL2WarehouseAddress + "|" + toWarehouseAddress;
 
-                Global.ju.execute("insert into orders_route(?,?) ", ordersIdInfo.getOrdersId(), resultRoute);
+                Global.ju.execute("update orders_route set route = ? where orders_id = ? ", resultRoute, ordersIdInfo.getOrdersId());
 
             } else { // 省内跨市运输 1-2-3-2-1\
                 Double From2Lng = 0.0, From2Lat = 0.0, To2Lng = 0.0, To2Lat = 0.0;
@@ -536,9 +541,8 @@ public class WarehouseController {
 
 
                 int targetFromLEVEL2Index = 0;
-
+                minDistance = Double.MAX_VALUE;
                 for (int i = 0; i < totalFromPossibleWareHouse_LEVEL2.size(); ++i) {
-                    minDistance = 1000000000.0;
                     Double curLng = (Double) totalFromPossibleWareHouse_LEVEL2.get(i).get("warehouse_lng");
                     Double curLat = (Double) totalFromPossibleWareHouse_LEVEL2.get(i).get("warehouse_lat");
 
@@ -564,13 +568,11 @@ public class WarehouseController {
                                 " cast(warehouse_lng as double) as warehouse_lng, " +
                                 " cast(warehouse_lat as double) as warehouse_lat "
                                 + " from warehouse "
-                                + " where warehouse_city = ? and warehouse_type = 2", formatSenderAddress[1]);
-
+                                + " where warehouse_city = ? and warehouse_type = 2", formatReceiverAddress[1]);
 
                 int targetToLEVEL2Index = 0;
-
+                minDistance = Double.MAX_VALUE;
                 for (int i = 0; i < totalToPossibleWareHouse_LEVEL2.size(); ++i) {
-                    minDistance = 1000000000.0;
                     Double curLng = (Double) totalToPossibleWareHouse_LEVEL2.get(i).get("warehouse_lng");
                     Double curLat = (Double) totalToPossibleWareHouse_LEVEL2.get(i).get("warehouse_lat");
 
@@ -600,9 +602,8 @@ public class WarehouseController {
 
 
                 int targetLEVEL3Index = 0;
-
+                minDistance = 1000000000.0;
                 for (int i = 0; i < totalFromPossibleWareHouse_LEVEL3.size(); ++i) {
-                    minDistance = 1000000000.0;
                     Double curLng = (Double) totalFromPossibleWareHouse_LEVEL3.get(i).get("warehouse_lng");
                     Double curLat = (Double) totalFromPossibleWareHouse_LEVEL3.get(i).get("warehouse_lat");
 
@@ -624,7 +625,7 @@ public class WarehouseController {
                                 Level3WarehouseAddress + "|" +
                                 ToLevel2WarehouseAddress + "|" + toWarehouseAddress;
 
-                Global.ju.execute("insert into orders_route(?,?) ", ordersIdInfo.getOrdersId(), resultRoute);
+                Global.ju.execute("update orders_route set route = ? where orders_id = ? ", resultRoute, ordersIdInfo.getOrdersId());
             }
         } else { // 跨省运输 1-2-3-3-2-1
             Double From2Lng = 0.0, From2Lat = 0.0, To2Lng = 0.0, To2Lat = 0.0;
@@ -641,9 +642,8 @@ public class WarehouseController {
 
 
             int targetFromLEVEL2Index = 0;
-
+            minDistance = Double.MAX_VALUE;
             for (int i = 0; i < totalFromPossibleWareHouse_LEVEL2.size(); ++i) {
-                minDistance = 1000000000.0;
                 Double curLng = (Double) totalFromPossibleWareHouse_LEVEL2.get(i).get("warehouse_lng");
                 Double curLat = (Double) totalFromPossibleWareHouse_LEVEL2.get(i).get("warehouse_lat");
 
@@ -669,19 +669,17 @@ public class WarehouseController {
                             " cast(warehouse_lng as double) as warehouse_lng, " +
                             " cast(warehouse_lat as double) as warehouse_lat "
                             + " from warehouse "
-                            + " where warehouse_city = ? and warehouse_type = 2", formatSenderAddress[1]);
+                            + " where warehouse_city = ? and warehouse_type = 2", formatReceiverAddress[1]);
 
 
             int targetToLEVEL2Index = 0;
-
+            minDistance = Double.MAX_VALUE;
             for (int i = 0; i < totalToPossibleWareHouse_LEVEL2.size(); ++i) {
-                minDistance = 1000000000.0;
                 Double curLng = (Double) totalToPossibleWareHouse_LEVEL2.get(i).get("warehouse_lng");
                 Double curLat = (Double) totalToPossibleWareHouse_LEVEL2.get(i).get("warehouse_lat");
 
                 // 计算收件仓库与二级接收站距离
                 double curDistance = Global.getDistance(toLat, toLng, curLat, curLng);
-
                 if (curDistance < minDistance) {
                     targetToLEVEL2Index = i;
                     minDistance = curDistance;
@@ -706,8 +704,8 @@ public class WarehouseController {
 
             int targetFromLEVEL3Index = 0;
 
+            minDistance = 1000000000.0;
             for (int i = 0; i < totalFromPossibleWareHouse_LEVEL3.size(); ++i) {
-                minDistance = 1000000000.0;
                 Double curLng = (Double) totalFromPossibleWareHouse_LEVEL3.get(i).get("warehouse_lng");
                 Double curLat = (Double) totalFromPossibleWareHouse_LEVEL3.get(i).get("warehouse_lat");
 
@@ -737,8 +735,8 @@ public class WarehouseController {
 
             int targetToLEVEL3Index = 0;
 
+            minDistance = 1000000000.0;
             for (int i = 0; i < totalToPossibleWareHouse_LEVEL3.size(); ++i) {
-                minDistance = 1000000000.0;
                 Double curLng = (Double) totalToPossibleWareHouse_LEVEL3.get(i).get("warehouse_lng");
                 Double curLat = (Double) totalToPossibleWareHouse_LEVEL3.get(i).get("warehouse_lat");
 
@@ -759,14 +757,11 @@ public class WarehouseController {
 
 
             // 3级别仓库内部disjktra
-
             String Level3Route = Global.AssignLevel3Route(FromLevel3WarehouseAddress, ToLevel3WarehouseAddress);
-
             String resultRoute = fromWarehouseAddress + "|" + FromLevel2WarehouseAddress + "|" +
                     Level3Route + "|" +
                     ToLevel2WarehouseAddress + "|" + toWarehouseAddress;
-
-            Global.ju.execute("insert into orders_route(?,?) ", ordersIdInfo.getOrdersId(), resultRoute);
+            Global.ju.execute("update orders_route set route = ? where orders_id = ? ", resultRoute, ordersIdInfo.getOrdersId());
         }
     }
 }
