@@ -383,8 +383,33 @@ public class WarehouseController {
         }
         return list;
     }
+    // 根据省份查询仓库
+    @PostMapping("/api/warehouse/warehouseProvince")
+    public ArrayList<HashMap<String,Object>> warehouseProvince(@RequestBody WarehouseInfo warehouseInfo){
+        String sql = "select * from warehouse where warehouse_province like ?";
+        String province = '%' + warehouseInfo.getWarehouseProvince() + '%';
+        ArrayList<HashMap<String,Object>> list = Global.ju.query(sql,province);
+        return list;
+    }
+    // 根据城市查询仓库
+    @PostMapping("/api/warehouse/warehouseCity")
+    public ArrayList<HashMap<String,Object>> warehouseCity(@RequestBody WarehouseInfo warehouseInfo){
+        String sql = "select * from warehouse where warehouse_city like ?";
+        String city = '%' + warehouseInfo.getWarehouseCity() + '%';
+        ArrayList<HashMap<String,Object>> list = Global.ju.query(sql,city);
+        return list;
+    }
 
+    // 根据地区查询仓库
+    @PostMapping("/api/warehouse/warehouseDistrict")
+    public ArrayList<HashMap<String,Object>> warehouseDistrict(@RequestBody WarehouseInfo warehouseInfo){
+        String sql = "select * from warehouse where warehouse_district like ?";
+        String district = '%' + warehouseInfo.getWarehouseDistrict() + '%';
+        ArrayList<HashMap<String,Object>> list = Global.ju.query(sql,district);
+        return list;
+    }
 
+    // 最优路径
     public void getAssign(OrdersIdInfo ordersIdInfo) {
         ArrayList<HashMap<String, Object>> resList =
                 Global.ju.query("select sender_address, receiver_address "

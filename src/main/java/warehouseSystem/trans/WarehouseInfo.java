@@ -15,7 +15,7 @@ public class WarehouseInfo {
     private String warehouseCreationtime;
     private String warehouseLng;
     private String warehouseLat;
-    private String warehouseProvince;
+        private String warehouseProvince;
     private String warehouseCity;
     private String warehouseDistrict;
     private String warehouseToAddress;
