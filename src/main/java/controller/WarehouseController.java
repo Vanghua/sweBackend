@@ -340,7 +340,7 @@ public class WarehouseController {
     public ArrayList<HashMap<String, Object>> exwarehouseSheet(@RequestBody WarehouseInfo warehouseInfo) {
         ArrayList<HashMap<String, Object>> totalIdList = Global.ju.query(
                 "select orders_id " +
-                        " from orders_position " +
+                        "from orders_position " +
                         "where warehouse_address = ?",
                 warehouseInfo.getWarehouseAddress());
         ArrayList<String> answer = new ArrayList<>();
@@ -354,16 +354,21 @@ public class WarehouseController {
 
             int totalWarehouseNum = totalWarehouseAddress.length;
 
-            for (int j = 0; j < totalWarehouseNum; ++j) {
-                if (totalWarehouseAddress[j].equals(warehouseInfo.getWarehouseAddress()) &&
-                        totalWarehouseAddress[j + 1].equals(warehouseInfo.getWarehouseToAddress())
-                ) {
-                    // warning: 如果是最后一站，会越界
+            if(warehouseInfo.getWarehouseToAddress().equals("!")){
+                for (int j = 0; j < totalWarehouseNum; ++j) {
                     answer.add(currentId);
-                    break;
+                }
+            }else{
+                for (int j = 0; j < totalWarehouseNum; ++j) {
+                    if (totalWarehouseAddress[j].equals(warehouseInfo.getWarehouseAddress()) &&
+                            totalWarehouseAddress[j + 1].equals(warehouseInfo.getWarehouseToAddress())
+                    ){
+                        // warning: 如果是最后一站，会越界
+                        answer.add(currentId);
+                        break;
+                    }
                 }
             }
-
         }
 
         // 待优化

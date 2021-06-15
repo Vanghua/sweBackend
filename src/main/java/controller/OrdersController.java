@@ -513,72 +513,69 @@ public class OrdersController {
 		
 		for(int i = 0; i < len; ++i) {
 			res[i] = new QueryCurrentOrdersInfo();
-			
+
 			HashMap<String, Object> cur = resList.get(i);
-			
+
 			res[i].setOrdersId((String) cur.get("orders_id"));
 			res[i].setOrdersName((String) cur.get("orders_name"));
 			res[i].setOrdersStatus((String) cur.get("orders_status"));
 			res[i].setCreateTime((String) cur.get("create_time"));
 			res[i].setAccountName((String) cur.get("account_name"));
 			res[i].setUserPriority((String) cur.get("user_priority"));
-			
+
 			res[i].setSenderName((String) cur.get("sender_name"));
 			res[i].setSenderPhone((String) cur.get("sender_phone"));
-			res[i].setSenderAddress( ((String) cur.get("sender_address")).split("\\|") );
+			res[i].setSenderAddress(((String) cur.get("sender_address")).split("\\|"));
 			res[i].setSenderDetailAddress((String) cur.get("sender_detail_address"));
 
 			res[i].setReceiverName((String) cur.get("receiver_name"));
 			res[i].setReceiverPhone((String) cur.get("receiver_phone"));
 			res[i].setReceiverAddress(((String) cur.get("receiver_address")).split("\\|"));
 			res[i].setReceiverDetailAddress((String) cur.get("receiver_detail_address"));
-			
+
 			res[i].setRoute(((String) cur.get("route")).split("\\|"));
-			
-			
+
+
 			// route lat lng
-			Double [] routeLat = new Double[res[i].getRoute().length];
-			Double [] routeLng = new Double[res[i].getRoute().length];
-			
-			for(int j = 0; j < res[i].getRoute().length; ++j) {
-					
-				ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select "
+			Double[] routeLat = new Double[res[i].getRoute().length];
+			Double[] routeLng = new Double[res[i].getRoute().length];
+			String[] routeTime = new String[res[i].getRoute().length];
+
+
+			if (!res[i].getRoute()[0].equals("")) {
+				for (int j = 0; j < res[i].getRoute().length; ++j) {
+					// System.out.println("订单 " + res[i].getOrdersId() + ", " + res[i].getOrdersName() + ", " + res[i].getRoute()[j]);
+
+					ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select "
 							+ "cast(warehouse_lat as double) as lat ,"
 							+ "cast(warehouse_lng as double) as lng "
-								+ " from warehouse "
-								+ " where warehouse_address = ?", res[i].getRoute()[j]);
-			
-				routeLat[j] = (Double) tmp.get(0).get("lat");
-				routeLng[j] = (Double) tmp.get(0).get("lng");
+							+ " from warehouse "
+							+ " where warehouse_address = ?", res[i].getRoute()[j]);
+
+					routeLat[j] = (Double) tmp.get(0).get("lat");
+					routeLng[j] = (Double) tmp.get(0).get("lng");
+				}
+				// reach time
+				for (int j = 0; j < res[i].getRoute().length; ++j) {
+					ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select cast(`warehouselist`.`list_warehouseTime` as char) as result"
+									+ " from good "
+									+ " left join storage on storage_goodId = good_id "
+									+ " left join warehouselist on list_storageId = storage_id "
+									+ " left join warehouse on warehouse_id = storage_warehouseId "
+									+ " where orders_id = ? and warehouse_address = ?",
+							res[i].getOrdersId(), res[i].getRoute()[j]);
+
+					if (!tmp.isEmpty()) {
+						routeTime[j] = (String) tmp.get(0).get("result");
+					} else {
+						routeTime[j] = "";
+					}
+				}
 			}
-			
 			res[i].setRouteLat(routeLat);
 			res[i].setRouteLng(routeLng);
-
-			// reach time
-			String[] routeTime = new String[res[i].getRoute().length];
-			
-			for(int j = 0; j < res[i].getRoute().length; ++j) {
-				ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select cast(`warehouselist`.`list_warehouseTime` as char) as result"
-						+ " from good "
-						+ " left join storage on storage_goodId = good_id "
-						+ " left join warehouselist on list_storageId = storage_id "
-						+ " left join warehouse on warehouse_id = storage_warehouseId "
-						+ " where orders_id = ? and warehouse_address = ?", 
-						res[i].getOrdersId(), res[i].getRoute()[j]);
-				
-				if(tmp.isEmpty()) {
-					routeTime[j] = (String) tmp.get(0).get("result");
-				}else {
-					routeTime[j] = "";
-				}
-			
-			
-			}
-			
 			res[i].setRouteTime(routeTime);
 		}
-		
 		return res;
 	}
 }
