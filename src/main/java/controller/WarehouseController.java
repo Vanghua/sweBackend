@@ -1,5 +1,6 @@
 package controller;
 
+import com.mysql.cj.util.StringUtils;
 import ordersSystem.trans.OrdersIdInfo;
 import org.assertj.core.util.Lists;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -407,6 +408,32 @@ public class WarehouseController {
         String district = '%' + warehouseInfo.getWarehouseDistrict() + '%';
         ArrayList<HashMap<String,Object>> list = Global.ju.query(sql,district);
         return list;
+    }
+    // 修改货架信息
+    @PostMapping("/api/warehouse/shelfUpdate")
+    public String shelfUpdate(@RequestBody ShelfInfo shelfInfo){
+        String sql = "";
+        if(!StringUtils.isNullOrEmpty(shelfInfo.getShelfId())&&StringUtils.isNullOrEmpty(shelfInfo.getShelfStorageNum()+"")){
+            // 货架号不为空
+            Global.ju.execute("update shelf set shelf_id = ? where shelf_id = ?",shelfInfo.getNewShelfId(),shelfInfo.getShelfId());
+            return "已更新货架号";
+        }else if(StringUtils.isNullOrEmpty(shelfInfo.getShelfId())&&!StringUtils.isNullOrEmpty(shelfInfo.getShelfStorageNum()+"")){
+            // 货架存位不为空
+            Global.ju.execute("update shelf set shelf_storageNum = ? where shelf_id = ?",shelfInfo.getNewShelfStorageNum(),shelfInfo.getShelfId());
+            int deltaNum = Integer.parseInt(Global.ju.query("select shelf_storageNum from shelf where shelf_id = ?",shelfInfo.getShelfId()).get(0).get("shelf_storageNum").toString()) - shelfInfo.getNewShelfStorageNum();
+            sql = "update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?";
+            Global.ju.execute(sql,deltaNum,shelfInfo.getShelfWarehouseId());
+            return "已更新货架存位";
+        }else if(!StringUtils.isNullOrEmpty(shelfInfo.getShelfId())&&!StringUtils.isNullOrEmpty(shelfInfo.getShelfStorageNum()+"")) {
+            // 都不空
+            Global.ju.execute("update shelf set shelf_id = ? where shelf_id = ?", shelfInfo.getNewShelfId(), shelfInfo.getShelfId());
+            Global.ju.execute("update shelf set shelf_storageNum = ? where shelf_id = ?", shelfInfo.getNewShelfStorageNum(), shelfInfo.getShelfId());
+            int deltaNum = Integer.parseInt(Global.ju.query("select shelf_storageNum from shelf where shelf_id = ?", shelfInfo.getShelfId()).get(0).get("shelf_storageNum").toString()) - shelfInfo.getNewShelfStorageNum();
+            sql = "update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?";
+            Global.ju.execute(sql, deltaNum, shelfInfo.getShelfWarehouseId());
+            return "已更新货架号与货架存位";
+        }
+        return "请确认修改项";
     }
 
     // 最优路径
