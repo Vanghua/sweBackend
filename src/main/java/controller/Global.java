@@ -74,63 +74,68 @@ public class Global {
     
     // dijkstra
     public static String AssignLevel3Route(String FromL3Address, String ToL3Address){
-    	
+
+    	// 获取所有三级仓库--樊华修改
     	ArrayList<HashMap<String, Object>> totalWarehouse = 
     			Global.ju.query("select warehouse_address as address, " +
 						" cast(warehouse_lng as double) as lng, " +
 						" cast(warehouse_lat as double) as lat " +
-						" from warehouse");
+						" from warehouse where warehouse_type = 3");
 		
     	
     	String route = "";
     	
     	int num = totalWarehouse.size();
     	Double[][] adjMatrix = new Double[num][num];
-    	
     	for(int i = 0; i < num; ++i) {
-    		for(int j = 0; i < num; ++j) {
+    		// 之前打的是i<num--樊华修改
+    		for(int j = 0; j < num; ++j) {
     			HashMap<String, Object> a = totalWarehouse.get(i);
     			HashMap<String, Object> b = totalWarehouse.get(j);
     			
     			adjMatrix[i][j] = adjMatrix[j][i] = getDistance((Double)a.get("lat"), (Double)a.get("lng"), 
     					(Double)b.get("lat"), (Double)b.get("lng"));
+    			if(i == j)
+					adjMatrix[i][j] = Double.MAX_VALUE;
     		}
     	}
     	
-    	Double [] result = new Double [adjMatrix.length];   
+    	Double [] result = new Double [adjMatrix.length];
         boolean[] used = new boolean[adjMatrix.length];  
         int [] pre = new int[adjMatrix.length];
         Stack<Integer> path = new Stack<>();
         
-        
+        // 修改get中的字段内容，原来为address，现在改为warehouse_address--樊华修改
         int source = 0, dest = 0;
         for(int i = 0; i < num; ++i) {
-        	if(FromL3Address.equals((String) totalWarehouse.get(i).get("address"))) {
+        	if(FromL3Address.equals((String) totalWarehouse.get(i).get("warehouse_address"))) {
         		source = i;
         	}
-        	if(ToL3Address.equals((String) totalWarehouse.get(i).get("address"))) {
+        	if(ToL3Address.equals((String) totalWarehouse.get(i).get("warehouse_address"))) {
         		dest = i;
         	}
         }
         
-        
         used[source] = true;  
-        for(int i = 1;i < adjMatrix.length;i++) {
+        for(int i = 0;i < adjMatrix.length;i++) {
             result[i] = adjMatrix[source][i];
             used[i] = false;
         }
     
         
-        
-        for(int i = 1;i < adjMatrix.length;i++) {
+        // 下面的三个循环原来都是从1开始，现在改为从0开始--樊华修改
+        for(int i = 0;i < adjMatrix.length;i++) {
             Double min = Double.MAX_VALUE;    
             int k = 0;
-            for(int j = 1;j < adjMatrix.length;j++) {  
+            for(int j = 0;j < adjMatrix.length;j++) {
                 if(!used[j] && min > result[j]) {
                     min = result[j];
                     k = j;
                 }
             }
+            // 之前的代码没有让始发三级仓库进入前缀数组--樊华修改
+            if(i == 1)
+            	pre[k] = source;
             used[k] = true; 
             if(k == dest) break;
             
@@ -138,12 +143,13 @@ public class Global {
                 if(!used[j]) { 
                     if(result[j] > min + adjMatrix[k][j]) {
                         result[j] = min + adjMatrix[k][j];
-                        pre[j] = k;
+                         pre[j] = k;
                     }
                 }
             }
+
         }
-        
+
         path.add(dest);
         int cur = dest;
         while(cur != source) {
@@ -154,7 +160,8 @@ public class Global {
         boolean first = true;
         while(!path.isEmpty()) {
         	if(first) first = false; else route += "|";
-        	route += (String) totalWarehouse.get(path.pop()).get("address");
+        	// 把get中的字段address改为warehouse_address
+        	route += (String) totalWarehouse.get(path.pop()).get("warehouse_address");
         }
         return route;
     }
