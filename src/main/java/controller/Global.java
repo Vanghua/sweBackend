@@ -1,6 +1,8 @@
 package controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 import util.JdbcUtilV2;
 import util.MailUtil;
@@ -67,5 +69,90 @@ public class Global {
         double acos = Math.acos(cos); // 反余弦值
 
         return EARTH_RADIUS * acos; // 最终结果
+    }
+    
+    
+    // dijkstra
+    public static String AssignLevel3Route(String FromL3Address, String ToL3Address){
+    	
+    	ArrayList<HashMap<String, Object>> totalWarehouse = 
+    			Global.ju.query("select warehouse_address as address, warehouse_lng as lng, warehouse_lat as lat from warehouse");
+		
+    	
+    	String route = "";
+    	
+    	int num = totalWarehouse.size();
+    	Double[][] adjMatrix = new Double[num][num];
+    	
+    	for(int i = 0; i < num; ++i) {
+    		for(int j = 0; i < num; ++j) {
+    			HashMap<String, Object> a = totalWarehouse.get(i);
+    			HashMap<String, Object> b = totalWarehouse.get(j);
+    			
+    			adjMatrix[i][j] = adjMatrix[j][i] = getDistance((Double)a.get("lat"), (Double)a.get("lng"), 
+    					(Double)b.get("lat"), (Double)b.get("lng"));
+    		}
+    	}
+    	
+    	Double [] result = new Double [adjMatrix.length];   
+        boolean[] used = new boolean[adjMatrix.length];  
+        int [] pre = new int[adjMatrix.length];
+        Stack<Integer> path = new Stack<>();
+        
+        
+        int source = 0, dest = 0;
+        for(int i = 0; i < num; ++i) {
+        	if(FromL3Address.equals((String) totalWarehouse.get(i).get("address"))) {
+        		source = i;
+        	}
+        	if(ToL3Address.equals((String) totalWarehouse.get(i).get("address"))) {
+        		dest = i;
+        	}
+        }
+        
+        
+        used[source] = true;  
+        for(int i = 1;i < adjMatrix.length;i++) {
+            result[i] = adjMatrix[source][i];
+            used[i] = false;
+        }
+    
+        
+        
+        for(int i = 1;i < adjMatrix.length;i++) {
+            Double min = Double.MAX_VALUE;    
+            int k = 0;
+            for(int j = 1;j < adjMatrix.length;j++) {  
+                if(!used[j] && min > result[j]) {
+                    min = result[j];
+                    k = j;
+                }
+            }
+            used[k] = true; 
+            if(k == dest) break;
+            
+            for(int j = 1;j < adjMatrix.length;j++) {  
+                if(!used[j]) { 
+                    if(result[j] > min + adjMatrix[k][j]) {
+                        result[j] = min + adjMatrix[k][j];
+                        pre[j] = k;
+                    }
+                }
+            }
+        }
+        
+        path.add(dest);
+        int cur = dest;
+        while(cur != source) {
+        	path.add(pre[cur]);
+        	cur = pre[cur];
+        }
+        
+        boolean first = true;
+        while(!path.isEmpty()) {
+        	if(first) first = false; else route += "|";
+        	route += (String) totalWarehouse.get(path.pop()).get("address");
+        }
+        return route;
     }
 }
