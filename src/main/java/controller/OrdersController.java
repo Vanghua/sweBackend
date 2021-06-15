@@ -534,6 +534,49 @@ public class OrdersController {
 			res[i].setReceiverDetailAddress((String) cur.get("receiver_detail_address"));
 			
 			res[i].setRoute(((String) cur.get("route")).split("\\|"));
+			
+			
+			// route lat lng
+			Double [] routeLat = new Double[res[i].getRoute().length];
+			Double [] routeLng = new Double[res[i].getRoute().length];
+			
+			for(int j = 0; j < res[i].getRoute().length; ++j) {
+					
+				ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select "
+							+ "cast(warehouse_lat as double) as lat ,"
+							+ "cast(warehouse_lng as double) as lng "
+								+ " from warehouse "
+								+ " where warehouse_address = ?", res[i].getRoute()[j]);
+			
+				routeLat[j] = (Double) tmp.get(0).get("lat");
+				routeLng[j] = (Double) tmp.get(0).get("lng");
+			}
+			
+			res[i].setRouteLat(routeLat);
+			res[i].setRouteLng(routeLng);
+
+			// reach time
+			String[] routeTime = new String[res[i].getRoute().length];
+			
+			for(int j = 0; j < res[i].getRoute().length; ++j) {
+				ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select cast(`warehouselist`.`list_warehouseTime` as char) as result"
+						+ " from good "
+						+ " left join storage on storage_goodId = good_id "
+						+ " left join warehouselist on list_storageId = storage_id "
+						+ " left join warehouse on warehouse_id = storage_warehouseId "
+						+ " where orders_id = ? and warehouse_address = ?", 
+						res[i].getOrdersId(), res[i].getRoute()[j]);
+				
+				if(tmp.isEmpty()) {
+					routeTime[j] = (String) tmp.get(0).get("result");
+				}else {
+					routeTime[j] = "";
+				}
+			
+			
+			}
+			
+			res[i].setRouteTime(routeTime);
 		}
 		
 		return res;
