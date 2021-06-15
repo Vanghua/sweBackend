@@ -413,22 +413,24 @@ public class WarehouseController {
     @PostMapping("/api/warehouse/shelfUpdate")
     public String shelfUpdate(@RequestBody ShelfInfo shelfInfo){
         String sql = "";
-        if(!StringUtils.isNullOrEmpty(shelfInfo.getShelfId())&&StringUtils.isNullOrEmpty(shelfInfo.getShelfStorageNum()+"")){
+        if(!StringUtils.isNullOrEmpty(shelfInfo.getNewShelfId())&&StringUtils.isNullOrEmpty(shelfInfo.getNewShelfStorageNum())){
             // 货架号不为空
-            Global.ju.execute("update shelf set shelf_id = ? where shelf_id = ?",shelfInfo.getNewShelfId(),shelfInfo.getShelfId());
+            Global.ju.execute("update shelf set shelf_id = ? where shelf_id = ? and shelf_warehouseId = ?",shelfInfo.getNewShelfId(),shelfInfo.getShelfId(),shelfInfo.getShelfWarehouseId());
+            Global.ju.execute("update storage set storage_shelfId = ? where storage_shelfId = ?",shelfInfo.getNewShelfId(),shelfInfo.getNewShelfId());
             return "已更新货架号";
-        }else if(StringUtils.isNullOrEmpty(shelfInfo.getShelfId())&&!StringUtils.isNullOrEmpty(shelfInfo.getShelfStorageNum()+"")){
+        }else if(StringUtils.isNullOrEmpty(shelfInfo.getNewShelfId())&&!StringUtils.isNullOrEmpty(shelfInfo.getNewShelfStorageNum())){
             // 货架存位不为空
-            Global.ju.execute("update shelf set shelf_storageNum = ? where shelf_id = ?",shelfInfo.getNewShelfStorageNum(),shelfInfo.getShelfId());
-            int deltaNum = Integer.parseInt(Global.ju.query("select shelf_storageNum from shelf where shelf_id = ?",shelfInfo.getShelfId()).get(0).get("shelf_storageNum").toString()) - shelfInfo.getNewShelfStorageNum();
+            int deltaNum = Integer.parseInt(Global.ju.query("select shelf_storageNum from shelf where shelf_id = ? and shelf_warehouseId = ?",shelfInfo.getShelfId(),shelfInfo.getShelfWarehouseId()).get(0).get("shelf_storageNum").toString()) - Integer.parseInt(shelfInfo.getNewShelfStorageNum());
+            Global.ju.execute("update shelf set shelf_storageNum = ? where shelf_id = ? and shelf_warehouseId = ?",shelfInfo.getNewShelfStorageNum(),shelfInfo.getShelfId(),shelfInfo.getShelfWarehouseId());
             sql = "update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?";
             Global.ju.execute(sql,deltaNum,shelfInfo.getShelfWarehouseId());
             return "已更新货架存位";
-        }else if(!StringUtils.isNullOrEmpty(shelfInfo.getShelfId())&&!StringUtils.isNullOrEmpty(shelfInfo.getShelfStorageNum()+"")) {
+        }else if(!StringUtils.isNullOrEmpty(shelfInfo.getNewShelfId())&&!StringUtils.isNullOrEmpty(shelfInfo.getNewShelfStorageNum())) {
             // 都不空
-            Global.ju.execute("update shelf set shelf_id = ? where shelf_id = ?", shelfInfo.getNewShelfId(), shelfInfo.getShelfId());
-            Global.ju.execute("update shelf set shelf_storageNum = ? where shelf_id = ?", shelfInfo.getNewShelfStorageNum(), shelfInfo.getShelfId());
-            int deltaNum = Integer.parseInt(Global.ju.query("select shelf_storageNum from shelf where shelf_id = ?", shelfInfo.getShelfId()).get(0).get("shelf_storageNum").toString()) - shelfInfo.getNewShelfStorageNum();
+            int deltaNum = Integer.parseInt(Global.ju.query("select shelf_storageNum from shelf where shelf_id = ? and shelf_warehouseId = ?",
+                    shelfInfo.getShelfId(),shelfInfo.getShelfWarehouseId()).get(0).get("shelf_storageNum").toString()) - Integer.parseInt(shelfInfo.getNewShelfStorageNum());
+            Global.ju.execute("update storage set storage_shelfId = ? where storage_shelfId = ?",shelfInfo.getNewShelfId(),shelfInfo.getNewShelfId());
+            Global.ju.execute("update shelf set shelf_id = ?,shelf_storageNum = ? where shelf_id = ? and shelf_warehouseId = ?", shelfInfo.getNewShelfId(), shelfInfo.getNewShelfStorageNum(),shelfInfo.getShelfId(),shelfInfo.getShelfWarehouseId());
             sql = "update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?";
             Global.ju.execute(sql, deltaNum, shelfInfo.getShelfWarehouseId());
             return "已更新货架号与货架存位";
