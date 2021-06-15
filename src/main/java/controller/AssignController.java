@@ -149,7 +149,7 @@ public class AssignController {
     				Double curLng = (Double) totalFromPossibleWareHouse_LEVEL2.get(i).get("warehouse_lng");
     				Double curLat = (Double) totalFromPossibleWareHouse_LEVEL2.get(i).get("warehouse_lat");
     				
-    				// 计算二级仓库与发件接收站举例
+    				// 计算二级仓库与发件接收站距离
     				double curDistance = Global.getDistance(fromLat, fromLng, curLat, curLng);
     				
     				if(curDistance < minDistance) {
@@ -230,8 +230,9 @@ public class AssignController {
     			Global.ju.execute("insert into orders_route(?,?) ", ordersIdInfo.getOrdersId(), resultRoute);
     		}
     	}else { // 跨省运输 1-2-3-3-2-1
-    		Double From2Lng = 0.0, From2Lat = 0.0, To2Lng = 0.0, To2Lat = 0.0;
-    		Double From3Lng = 0.0, From3Lat = 0.0, To3Lng = 0.0, To3Lat = 0.0;
+			Double From2Lng = 0.0, From2Lat = 0.0, To2Lng = 0.0, To2Lat = 0.0;
+    		@SuppressWarnings("unused")
+			Double From3Lng = 0.0, From3Lat = 0.0, To3Lng = 0.0, To3Lat = 0.0;
     		
 			// 1-2
 			ArrayList<HashMap<String, Object>> totalFromPossibleWareHouse_LEVEL2 = 
@@ -294,12 +295,73 @@ public class AssignController {
 			
 			// 2-3 转省内3级仓库
 			
-//			String FromLevel3WarehouseAddress = ?;
+			ArrayList<HashMap<String, Object>> totalFromPossibleWareHouse_LEVEL3 = 
+	    			Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+	    					+ " from warehouse "
+	    					+ " where warehouse_province = ? and warehouse_type = 3", formatSenderAddress[0]);
+			
+			
+			int targetFromLEVEL3Index = 0;
+			
+			for(int i = 0; i < totalFromPossibleWareHouse_LEVEL3.size(); ++i) {
+				minDistance = 1000000000.0;
+				Double curLng = (Double) totalFromPossibleWareHouse_LEVEL3.get(i).get("warehouse_lng");
+				Double curLat = (Double) totalFromPossibleWareHouse_LEVEL3.get(i).get("warehouse_lat");
+				
+				// 计算二级仓库与三级仓库距离
+				double curDistance = Global.getDistance(From2Lat, From2Lng, curLat, curLng);
+				
+				if(curDistance < minDistance) {
+					targetFromLEVEL3Index = i; 
+					minDistance = curDistance;
+					
+					From3Lng = curLng;
+					From3Lat = curLat;
+				}
+			}
+			
+			String FromLevel3WarehouseAddress = (String) totalFromPossibleWareHouse_LEVEL3.get(targetFromLEVEL3Index).
+					get("warehouse_address");
 			
 			// 3-2 转省内3级仓库
-//			String ToLevel3WarehouseAddress = ?
+			ArrayList<HashMap<String, Object>> totalToPossibleWareHouse_LEVEL3 = 
+	    			Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+	    					+ " from warehouse "
+	    					+ " where warehouse_province = ? and warehouse_type = 3", formatReceiverAddress[0]);
+			
+			
+			int targetToLEVEL3Index = 0;
+			
+			for(int i = 0; i < totalToPossibleWareHouse_LEVEL3.size(); ++i) {
+				minDistance = 1000000000.0;
+				Double curLng = (Double) totalToPossibleWareHouse_LEVEL3.get(i).get("warehouse_lng");
+				Double curLat = (Double) totalToPossibleWareHouse_LEVEL3.get(i).get("warehouse_lat");
+				
+				// 计算二级仓库与三级仓库距离
+				double curDistance = Global.getDistance(To2Lat, To2Lng, curLat, curLng);
+				
+				if(curDistance < minDistance) {
+					targetFromLEVEL3Index = i; 
+					minDistance = curDistance;
+					
+					To3Lng = curLng;
+					To3Lat = curLat;
+				}
+			}
+			
+			String ToLevel3WarehouseAddress = (String) totalToPossibleWareHouse_LEVEL3.get(targetToLEVEL3Index).
+					get("warehouse_address");
+			
 			
 			// 3级别仓库内部disjktra
+			
+			String Level3Route = Global.AssignLevel3Route(FromLevel3WarehouseAddress, ToLevel3WarehouseAddress);
+			
+			String resultRoute = fromWarehouseAddress + "|" + FromLevel2WarehouseAddress + "|" + 
+							Level3Route + "|" + 
+							ToLevel2WarehouseAddress + "|" + toWarehouseAddress;
+    	
+			Global.ju.execute("insert into orders_route(?,?) ", ordersIdInfo.getOrdersId(), resultRoute);
     	}
     	
     	return "成功";
