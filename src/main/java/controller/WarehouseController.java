@@ -776,4 +776,23 @@ public class WarehouseController {
             Global.ju.execute("update orders_route set route = ? where orders_id = ? ", resultRoute, ordersIdInfo.getOrdersId());
         }
     }
+
+    @PostMapping("/api/warehouse/goodGet")
+    public String goodGet(@RequestBody GoodInfo goodInfo){
+        String sql = "select warehouse_address " +
+                "from storage left join good on storage_goodId = good_id " +
+                "left join warehouse_id = storage_warehouseId " +
+                "where orders_id = ?";
+        ArrayList<HashMap<String,Object>> list = Global.ju.query(sql,goodInfo.getOrderId());
+        if(list.size() > 0){
+            if(list.get(0).get("warehouse_address").equals(goodInfo.getWarehouseInfo().getWarehouseAddress())){
+                tmpFunction(goodInfo);
+                return "取件成功";
+            }else {
+                return "货物未到目的驿站";
+            }
+        }else{
+            return "请确认订单号";
+        }
+    }
 }
