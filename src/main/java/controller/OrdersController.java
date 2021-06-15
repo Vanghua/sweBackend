@@ -63,6 +63,7 @@ public class OrdersController {
 	
 	@PostMapping("api/orders/checkPass")
 	public String checkOrders(@RequestBody CheckPassInfo checkPassInfo ) { // 订单审核通过
+
 		Global.ju.execute("update orders set orders_status = ?, good_priority = ?, good_weight = ?, orders_price = ? where orders_id = ?", 
 				"待支付",
 				checkPassInfo.getGoodPriority(),

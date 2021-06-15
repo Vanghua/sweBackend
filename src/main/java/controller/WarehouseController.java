@@ -423,7 +423,9 @@ public class WarehouseController {
 
         // 物品初始所在接收站的经纬度
         ArrayList<HashMap<String, Object>> currentPositionList =
-                Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lat "
+                Global.ju.query("select warehouse_address, " +
+                        " cast(warehouse_lng as double) as warehouse_lng, " +
+                        " cast(warehouse_lat as double) as warehouse_lat "
                         + "from orders_position "
                         + "where orders_id = ?", ordersIdInfo.getOrdersId());
         // result
@@ -431,11 +433,13 @@ public class WarehouseController {
         fromLng = (Double) currentPositionList.get(0).get("warehouse_lng");
         fromLat = (Double) currentPositionList.get(0).get("warehouse_lat");
 
-        // 找到收件人的接收站仓库, 演示时注意建立对应区的接收站
+        // 找到收件人的所在的市内 离 收件地址最近的接收站
         ArrayList<HashMap<String, Object>> totalPossibleWareHouse =
-                Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                Global.ju.query("select warehouse_address, " +
+                        " cast(warehouse_lng as double) as warehouse_lng, " +
+                        " cast(warehouse_lat as double) as warehouse_lat "
                         + " from warehouse "
-                        + " where warehouse_district = ?", formatReceiverAddress[2]);
+                        + " where warehouse_city = ?", formatReceiverAddress[1]);
 
         int targetIndex = 0;
         double minDistance = 1000000000.0;
@@ -461,7 +465,9 @@ public class WarehouseController {
         if (formatSenderAddress[0].equals(formatReceiverAddress[0])) {
             if (formatSenderAddress[1].equals(formatReceiverAddress[1])) { // 市内运输, 1-2-1类别
                 ArrayList<HashMap<String, Object>> totalPossibleWareHouse_LEVEL2 =
-                        Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                        Global.ju.query("select warehouse_address, " +
+                                " cast(warehouse_lng as double) as warehouse_lng, " +
+                                " cast(warehouse_lat as double) as warehouse_lat "
                                 + " from warehouse "
                                 + " where warehouse_city = ? and warehouse_type = 2", formatReceiverAddress[1]);
 
@@ -493,7 +499,9 @@ public class WarehouseController {
                 Double From2Lng = 0.0, From2Lat = 0.0, To2Lng = 0.0, To2Lat = 0.0;
                 // 1-2
                 ArrayList<HashMap<String, Object>> totalFromPossibleWareHouse_LEVEL2 =
-                        Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                        Global.ju.query("select warehouse_address, " +
+                                " cast(warehouse_lng as double) as warehouse_lng, " +
+                                " cast(warehouse_lat as double) as warehouse_lat"
                                 + " from warehouse "
                                 + " where warehouse_city = ? and warehouse_type = 2", formatSenderAddress[1]);
 
@@ -523,7 +531,9 @@ public class WarehouseController {
                 // 2-1
 
                 ArrayList<HashMap<String, Object>> totalToPossibleWareHouse_LEVEL2 =
-                        Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                        Global.ju.query("select warehouse_address, " +
+                                " cast(warehouse_lng as double) as warehouse_lng, " +
+                                " cast(warehouse_lat as double) as warehouse_lat "
                                 + " from warehouse "
                                 + " where warehouse_city = ? and warehouse_type = 2", formatSenderAddress[1]);
 
@@ -554,7 +564,9 @@ public class WarehouseController {
                 // 2-3-2
 
                 ArrayList<HashMap<String, Object>> totalFromPossibleWareHouse_LEVEL3 =
-                        Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                        Global.ju.query("select warehouse_address, " +
+                                " cast(warehouse_lng as double) as warehouse_lng, " +
+                                " cast(warehouse_lat as double) as warehouse_lat "
                                 + " from warehouse where warehouse_type = 3");
 
 
@@ -592,7 +604,9 @@ public class WarehouseController {
 
             // 1-2
             ArrayList<HashMap<String, Object>> totalFromPossibleWareHouse_LEVEL2 =
-                    Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                    Global.ju.query("select warehouse_address, " +
+                            " cast(warehouse_lng as double) as warehouse_lng, " +
+                            " cast(warehouse_lat as double) as warehouse_lat "
                             + " from warehouse "
                             + " where warehouse_city = ? and warehouse_type = 2", formatSenderAddress[1]);
 
@@ -622,7 +636,9 @@ public class WarehouseController {
             // 2-1
 
             ArrayList<HashMap<String, Object>> totalToPossibleWareHouse_LEVEL2 =
-                    Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                    Global.ju.query("select warehouse_address, " +
+                            " cast(warehouse_lng as double) as warehouse_lng, " +
+                            " cast(warehouse_lat as double) as warehouse_lat "
                             + " from warehouse "
                             + " where warehouse_city = ? and warehouse_type = 2", formatSenderAddress[1]);
 
@@ -652,7 +668,9 @@ public class WarehouseController {
             // 2-3 转省内3级仓库
 
             ArrayList<HashMap<String, Object>> totalFromPossibleWareHouse_LEVEL3 =
-                    Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                    Global.ju.query("select warehouse_address, " +
+                            " cast(warehouse_lng as double) as warehouse_lng, " +
+                            " cast(warehouse_lat as double) as warehouse_lat "
                             + " from warehouse "
                             + " where warehouse_province = ? and warehouse_type = 3", formatSenderAddress[0]);
 
@@ -681,7 +699,9 @@ public class WarehouseController {
 
             // 3-2 转省内3级仓库
             ArrayList<HashMap<String, Object>> totalToPossibleWareHouse_LEVEL3 =
-                    Global.ju.query("select warehouse_address, warehouse_lng, warehouse_lnt "
+                    Global.ju.query("select warehouse_address, " +
+                            " cast(warehouse_lng as double) as warehouse_lng, " +
+                            " cast(warehouse_lat as double) as warehouse_lat "
                             + " from warehouse "
                             + " where warehouse_province = ? and warehouse_type = 3", formatReceiverAddress[0]);
 

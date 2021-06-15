@@ -54,6 +54,24 @@
 <!--			<artifactId>mysql</artifactId>-->
 <!--			<version>1.0.0</version>-->
 <!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>phoneMail1</groupId>-->
+<!--			<artifactId>phoneMail1</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>phoneMail2</groupId>-->
+<!--			<artifactId>phoneMail2</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>phoneMail3</groupId>-->
+<!--			<artifactId>phoneMail3</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>
