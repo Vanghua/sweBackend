@@ -213,48 +213,53 @@ public class WarehouseController {
         String id = "";
         ArrayList<HashMap<String, Object>> resultList;
         sql = "select good_id from good where orders_id = ?";
-        String good_id = Global.ju.query(sql,goodInfo.getOrderId()).get(0).get("good_id").toString();
-        if (Global.ju.exists("select * from storage where storage_goodId = ?", good_id)) {
-            return "货物已入库";
-        } else if (!Global.ju.exists("select * from warehouse where warehouse_storagenum >= ? and warehouse_id = ?", goodInfo.getGoodNum(),warehouse_result)) {
-            return "当前存位不足,无法办理入库";
-        } else {
-            sql = "select shelf_id from shelf where shelf_storageNum >= ? and shelf_warehouseId = ?";
-            resultList = Global.ju.query(sql, goodInfo.getGoodNum(),warehouse_result); // 查出当前可以直接存入货物的货架
-            String shelf_id;
-            num = goodInfo.getGoodNum();
-            if (resultList.size() > 0) { // 找到可以直接存入货物的货架
-                shelf_id = (String) resultList.get(0).get("shelf_id");
-                Global.ju.execute("update shelf set shelf_storageNum = shelf_storageNum - ? where shelf_id = ? and shelf_warehouseId = ?", goodInfo.getGoodNum(), shelf_id,warehouse_result);
-                Global.ju.execute("insert into storage values(default,?,?,?,?)", warehouse_result, good_id, shelf_id, goodInfo.getGoodNum());
+        ArrayList<HashMap<String,Object>> res = Global.ju.query(sql,goodInfo.getOrderId());
+        if(res.size() > 0) {
+            String good_id = res.get(0).get("good_id").toString();
+            if (Global.ju.exists("select * from storage where storage_goodId = ?", good_id)) {
+                return "货物已入库";
+            } else if (!Global.ju.exists("select * from warehouse where warehouse_storagenum >= ? and warehouse_id = ?", goodInfo.getGoodNum(), warehouse_result)) {
+                return "当前存位不足,无法办理入库";
             } else {
-                sql = "select shelf_id,shelf_storageNum from shelf where shelf_warehouseId = ?";
-                resultList = Global.ju.query(sql, warehouse_result);
-                HashMap<String, Integer> idList = new HashMap<>();
-                for (HashMap<String, Object> o : resultList) {
-                    shelf_id = (String) o.get("shelf_id");
-                    shelf_res = (int) o.get("shelf_storageNum");
-                    if (shelf_res >= num) {
-                        idList.put(shelf_id, num);
-                        break;
-                    } else {
-                        num -= shelf_res;
-                        idList.put(shelf_id, shelf_res);
+                sql = "select shelf_id from shelf where shelf_storageNum >= ? and shelf_warehouseId = ?";
+                resultList = Global.ju.query(sql, goodInfo.getGoodNum(), warehouse_result); // 查出当前可以直接存入货物的货架
+                String shelf_id;
+                num = goodInfo.getGoodNum();
+                if (resultList.size() > 0) { // 找到可以直接存入货物的货架
+                    shelf_id = (String) resultList.get(0).get("shelf_id");
+                    Global.ju.execute("update shelf set shelf_storageNum = shelf_storageNum - ? where shelf_id = ? and shelf_warehouseId = ?", goodInfo.getGoodNum(), shelf_id, warehouse_result);
+                    Global.ju.execute("insert into storage values(default,?,?,?,?)", warehouse_result, good_id, shelf_id, goodInfo.getGoodNum());
+                } else {
+                    sql = "select shelf_id,shelf_storageNum from shelf where shelf_warehouseId = ?";
+                    resultList = Global.ju.query(sql, warehouse_result);
+                    HashMap<String, Integer> idList = new HashMap<>();
+                    for (HashMap<String, Object> o : resultList) {
+                        shelf_id = (String) o.get("shelf_id");
+                        shelf_res = (int) o.get("shelf_storageNum");
+                        if (shelf_res >= num) {
+                            idList.put(shelf_id, num);
+                            break;
+                        } else {
+                            num -= shelf_res;
+                            idList.put(shelf_id, shelf_res);
+                        }
+                    }
+                    for (Map.Entry<String, Integer> entry : idList.entrySet()) {
+                        id = entry.getKey();
+                        num = entry.getValue();
+                        Global.ju.execute("update shelf set shelf_storageNum = shelf_storageNum - ? where shelf_id = ?", num, id);
+                        Global.ju.execute("insert into storage values(default,?,?,?,?)", warehouse_result, good_id, id, num);
                     }
                 }
-                for (Map.Entry<String, Integer> entry : idList.entrySet()) {
-                    id = entry.getKey();
-                    num = entry.getValue();
-                    Global.ju.execute("update shelf set shelf_storageNum = shelf_storageNum - ? where shelf_id = ?", num, id);
-                    Global.ju.execute("insert into storage values(default,?,?,?,?)", warehouse_result, good_id, id, num);
-                }
+                Global.ju.execute("update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?", goodInfo.getGoodNum(), warehouse_result);
+                sql = "select storage_id from storage where storage_goodId = ?";
+                resultList = Global.ju.query(sql, good_id);
+                storage_id = (int) resultList.get(0).get("storage_id");
+                Global.ju.execute("insert into warehouselist values(default,?,default,?)", storage_id, goodInfo.getManagerId());
+                return "入库办理完成";
             }
-            Global.ju.execute("update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?", goodInfo.getGoodNum(), warehouse_result);
-            sql = "select storage_id from storage where storage_goodId = ?";
-            resultList = Global.ju.query(sql, good_id);
-            storage_id = (int) resultList.get(0).get("storage_id");
-            Global.ju.execute("insert into warehouselist values(default,?,default,?)", storage_id, goodInfo.getManagerId());
-            return "入库办理完成";
+        }else{
+            return "订单信息输入错误";
         }
     }
 
@@ -270,10 +275,9 @@ public class WarehouseController {
         String shelf_sql = "";
         ArrayList<HashMap<String, Object>> resultList;
         sql = "select good_id from good where orders_id = ?";
-        String good_id = Global.ju.query(sql,goodInfo.getOrderId()).get(0).get("good_id").toString();
-        if (!Global.ju.exists("select * from storage where storage_goodId = ?", good_id)) {
-            return "货物不存在";
-        } else {
+        ArrayList<HashMap<String,Object>> res = Global.ju.query(sql,goodInfo.getOrderId());
+        if(res.size() > 0) {
+            String good_id = res.get(0).get("good_id").toString();
             sql = "select storage_warehouseId,storage_shelfId,sotrage_num from storage where storage_goodId = ?";
             resultList = Global.ju.query(sql, good_id);
             warehouse_sql = "update warehouse set warehouse_storagenum = warehouse_storagenum + ? where warehouse_id = ?";
@@ -292,6 +296,8 @@ public class WarehouseController {
             sql = "insert into ex_warehouselist values(default,?,default,?)";
             Global.ju.execute(sql, good_id, goodInfo.getManagerId());
             return "出库办理完成";
+        }else{
+            return "订单信息输入错误";
         }
     }
 
