@@ -169,7 +169,7 @@ public class WarehouseController {
             } else {
                 storageNum = (int) Global.ju.query("select * from shelf where shelf_id = ?", shelfInfo.getShelfId()).get(0).get("shelf_storageNum");
                 Global.ju.execute("delete from shelf where shelf_id = ?", shelfInfo.getShelfId());
-                Global.ju.execute("update warehouse set warehouse_storagenum = warehouse_storagenum - ?", storageNum);
+                Global.ju.execute("update warehouse set warehouse_storagenum = warehouse_storagenum - ? where warehouse_id = ?", storageNum,shelfInfo.getShelfWarehouseId());
                 return "删除成功";
             }
         }
