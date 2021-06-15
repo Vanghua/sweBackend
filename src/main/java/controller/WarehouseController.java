@@ -408,13 +408,13 @@ public class WarehouseController {
         fromLng = (Double) currentPositionList.get(0).get("warehouse_lng");
         fromLat = (Double) currentPositionList.get(0).get("warehouse_lat");
 
-        // 找到收件人的接收站仓库, 演示时注意建立对应区的接收站
+        // 找到收件人的所在的市内 离 收件地址最近的接收站
         ArrayList<HashMap<String, Object>> totalPossibleWareHouse =
                 Global.ju.query("select warehouse_address, " +
                         " cast(warehouse_lng as double) as warehouse_lng, " +
                         " cast(warehouse_lat as double) as warehouse_lat "
                         + " from warehouse "
-                        + " where warehouse_district = ?", formatReceiverAddress[2]);
+                        + " where warehouse_city = ?", formatReceiverAddress[1]);
 
         int targetIndex = 0;
         double minDistance = 1000000000.0;
