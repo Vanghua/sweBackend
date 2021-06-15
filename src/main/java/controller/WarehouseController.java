@@ -377,7 +377,7 @@ public class WarehouseController {
 
         // 待优化
         String sql = "SELECT `good`.* " +
-                "FROM `warehouselist` LEFT JOIN `storage` on `warehouselist`.`list_storageId` = `storage_id` " +
+                "FROM `storage` LEFT JOIN `warehouselist`on `warehouselist`.`list_storageId` = `storage_id` " +
                 "LEFT JOIN `good`on  `good`.`good_id` = `storage_goodId` " +
                 "ORDER BY ( `good`.`priority`*0.5 + datediff(now(), `list_warehouseTime` )*0.5) desc";
 
