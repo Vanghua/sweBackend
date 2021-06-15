@@ -97,6 +97,15 @@ public class HumanController {
         else
             return "请假失败";
     }
+    //重置请假时间
+    @PostMapping("api/humanresource/reset")
+    public String reset(@RequestBody ResetInfo resetInfo){
+        boolean sta_1 = Global.ju.execute("update checkingin set day_num = ?",resetInfo.getDay_num());
+        if(sta_1 == true)
+            return "重置成功";
+        else
+            return "重置失败";
+    }
     @PostMapping("api/humanresource/delete")
     public String delete(@RequestBody HumanDeleteInfo delete){
     //人员删除
