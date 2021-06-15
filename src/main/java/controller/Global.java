@@ -76,7 +76,10 @@ public class Global {
     public static String AssignLevel3Route(String FromL3Address, String ToL3Address){
     	
     	ArrayList<HashMap<String, Object>> totalWarehouse = 
-    			Global.ju.query("select warehouse_address as address, warehouse_lng as lng, warehouse_lat as lat from warehouse");
+    			Global.ju.query("select warehouse_address as address, " +
+						" cast(warehouse_lng as double) as lng, " +
+						" cast(warehouse_lat as double) as lat " +
+						" from warehouse");
 		
     	
     	String route = "";
