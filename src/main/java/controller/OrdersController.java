@@ -545,27 +545,27 @@ public class OrdersController {
 
 			if (!res[i].getRoute()[0].equals("")) {
 				for (int j = 0; j < res[i].getRoute().length; ++j) {
-					// System.out.println("订单 " + res[i].getOrdersId() + ", " + res[i].getOrdersName() + ", " + res[i].getRoute()[j]);
-
 					ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select "
 							+ "cast(warehouse_lat as double) as lat ,"
 							+ "cast(warehouse_lng as double) as lng "
 							+ " from warehouse "
 							+ " where warehouse_address = ?", res[i].getRoute()[j]);
-
+					
 					routeLat[j] = (Double) tmp.get(0).get("lat");
 					routeLng[j] = (Double) tmp.get(0).get("lng");
 				}
 				// reach time
 				for (int j = 0; j < res[i].getRoute().length; ++j) {
-					ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select cast(`warehouselist`.`list_warehouseTime` as char) as result"
+					
+					ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select "
+							+ " cast(`warehouselist`.`list_warehouseTime` as char) as result"
 									+ " from good "
 									+ " left join storage on storage_goodId = good_id "
 									+ " left join warehouselist on list_storageId = storage_id "
 									+ " left join warehouse on warehouse_id = storage_warehouseId "
 									+ " where orders_id = ? and warehouse_address = ?",
 							res[i].getOrdersId(), res[i].getRoute()[j]);
-
+					
 					if (!tmp.isEmpty()) {
 						routeTime[j] = (String) tmp.get(0).get("result");
 					} else {
@@ -637,7 +637,7 @@ public class OrdersController {
 							cancleOrdersInfo.getOrdersId(), 
 							cancleOrdersInfo.getCancleReason());
 					
-					Global.ju.execute("delete from orders_route where orders_id = ?", cancleOrdersInfo.getOrdersId());
+					// Global.ju.execute("delete from orders_route where orders_id = ?", cancleOrdersInfo.getOrdersId());
 					
 					return String.valueOf(0.9 * returnMoney);
 				}else {
@@ -681,7 +681,7 @@ public class OrdersController {
 								cancleOrdersInfo.getCancleReason());
 						
 						
-						Global.ju.execute("delete from orders_route where orders_id = ?", cancleOrdersInfo.getOrdersId());
+						// Global.ju.execute("delete from orders_route where orders_id = ?", cancleOrdersInfo.getOrdersId());
 						
 						
 						return String.valueOf(0.8 * returnMoney);
@@ -693,8 +693,54 @@ public class OrdersController {
 				return "禁止";
 			}
 		}
+	}
+	
+	
+	@PostMapping("api/orders/successOrders")
+	public String successOrders(@RequestBody OrdersIdInfo OrdersIdInfo) { // 点击“完成订单”
+		ArrayList<HashMap<String, Object>> tmp = 
+				Global.ju.query("select orders_status from orders where orders_id = ?", OrdersIdInfo.getOrdersId());
 		
-
+		if(tmp.isEmpty()) {
+			return "不存在";
+		}else {
+			if(((String) tmp.get(0).get("orders_status")).equals("进行中")){
+				ArrayList<HashMap<String, Object>>
+					curPos = Global.ju.query("select warehouse_address from warehouse where orders_id = ?", OrdersIdInfo.getOrdersId());
+				String ordersCurrentPos = (String) curPos.get(0).get("warehouse_address");
+				String orderExpectedPos[] = ((String) Global.ju.query("select route from orders_route where orders_id = ?", 
+						OrdersIdInfo.getOrdersId()).get(0).get("route")).split("\\|");
+				int len = orderExpectedPos.length;
+				
+				if(len > 0 && ordersCurrentPos.equals(orderExpectedPos[len-1])) {
+					// 出库
+					String managerId = (String)Global.ju.query("select warehouse_managerId as result "
+							+ "from warehouse "
+							+ "where warehouse_address = ?",
+							curPos).get(0).get("result");
+					
+					GoodInfo goodInfo = new GoodInfo();
+					goodInfo.setOrderId(OrdersIdInfo.getOrdersId());
+					goodInfo.setManagerId(managerId);
+					
+					WarehouseController.tmpFunction(goodInfo);
+					// 更新订单状态
+					
+					Global.ju.execute("update orders "
+							+ "set orders_status = ? "
+							+ "where orders_id = ?", 
+							"取消", 
+							OrdersIdInfo.getOrdersId());
+					// 加入已完成订单
+					
+					Global.ju.query("insert into success_orders (orders_id) values (?)", OrdersIdInfo.getOrdersId());
+					return "成功";
+				}else {
+					return "失败";
+				}
+			}
+		}
+		return "成功";
 	}
 }
 	
