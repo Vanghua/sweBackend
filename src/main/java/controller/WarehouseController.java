@@ -208,6 +208,7 @@ public class WarehouseController {
     @PostMapping("/api/warehouse/warehouing")
     public String warehousing(@RequestBody GoodInfo goodInfo) {
         int warehouse_result = goodInfo.getWarehouseInfo().getWarehouseId();
+        String warehouse_address = Global.ju.query("select * from warehouse where warehouse_id = ?",warehouse_result).get(0).get("warehouse_address").toString();
         int shelf_res = -1;
         int num = -1;
         int storage_id = -1;
@@ -258,7 +259,7 @@ public class WarehouseController {
                 resultList = Global.ju.query(sql, good_id);
                 storage_id = (int) resultList.get(0).get("storage_id");
                 Global.ju.execute("insert into warehouselist values(default,?,default,?)", storage_id, goodInfo.getManagerId());
-
+                Global.ju.execute("insert into in_table values(?,?,default)",goodInfo.getOrderId(),warehouse_address);
                 OrdersIdInfo idInfo = new OrdersIdInfo();
                 idInfo.setOrdersId(goodInfo.getOrderId());
                 if (Global.ju.query(
