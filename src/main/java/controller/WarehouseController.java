@@ -271,25 +271,21 @@ public class WarehouseController {
                 }
 
                 // 发送短信
-                
-                String totalRoute[] = ((String) 
-                		Global.ju.query("select route "
-                				+ " from orders_route "
-                				+ " where orders_id = ?", 
-                				goodInfo.getOrderId()).get(0).get("route")).split("\\|");
-                
-                if(warehouse_address.equals(totalRoute[totalRoute.length-1])){ // 到达最后一战
-                	
-                	HashMap<String, Object> resultMap = 
-                			Global.ju.query("select receiver_name, receiver_phone, orders_name from orders where orders_id = ?",
-                			goodInfo.getOrderId()).get(0);
-                	
-                	Global.su.sendSMS(
-                			(String) resultMap.get("receiver_phone"), 
-                			(String)resultMap.get("receiver_name"), 
-                			(String) resultMap.get("orders_name"), 
-                			warehouse_address);
-                }
+				/*
+				 * String totalRoute[] = ((String) Global.ju.query("select route " +
+				 * " from orders_route " + " where orders_id = ?",
+				 * goodInfo.getOrderId()).get(0).get("route")).split("\\|");
+				 * 
+				 * if(warehouse_address.equals(totalRoute[totalRoute.length-1])){ // 到达最后一战
+				 * 
+				 * HashMap<String, Object> resultMap = Global.ju.
+				 * query("select receiver_name, receiver_phone, orders_name from orders where orders_id = ?"
+				 * , goodInfo.getOrderId()).get(0);
+				 * 
+				 * Global.su.sendSMS( (String) resultMap.get("receiver_phone"),
+				 * (String)resultMap.get("receiver_name"), (String)
+				 * resultMap.get("orders_name"), warehouse_address); }
+				 */
                 return "入库办理完成";
             }
         } else {
