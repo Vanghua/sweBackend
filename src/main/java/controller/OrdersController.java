@@ -557,14 +557,11 @@ public class OrdersController {
 				// reach time
 				for (int j = 0; j < res[i].getRoute().length; ++j) {
 					
-					ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select "
-							+ " cast(`warehouselist`.`list_warehouseTime` as char) as result"
-									+ " from good "
-									+ " left join storage on storage_goodId = good_id "
-									+ " left join warehouselist on list_storageId = storage_id "
-									+ " left join warehouse on warehouse_id = storage_warehouseId "
-									+ " where orders_id = ? and warehouse_address = ?",
-							res[i].getOrdersId(), res[i].getRoute()[j]);
+					ArrayList<HashMap<String, Object>> tmp = Global.ju.query("select cast(in_time as char) as result " +
+									" from in_table " +
+									" where orders_id = ? and warehouse_address = ?",
+							res[i].getOrdersId(),
+							res[i].getRoute()[j]);
 					
 					if (!tmp.isEmpty()) {
 						routeTime[j] = (String) tmp.get(0).get("result");
