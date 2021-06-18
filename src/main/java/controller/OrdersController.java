@@ -426,7 +426,8 @@ public class OrdersController {
 				+ " sender_name, sender_phone, sender_address, sender_detail_address, "
 				+ " receiver_name, receiver_phone, receiver_address, receiver_detail_address, "
 				+ " cast(success_time as char) as success_time "
-				+ " from success_orders left join orders on success_orders.orders_id = orders.orders_id ";
+				+ " from success_orders left join orders on success_orders.orders_id = orders.orders_id " +
+				" where 1=1 ";
 		
 		if(commitQueryInfo.getQueryFilter().equals("name")) { // 按照名称模糊查询
 			sql += " and orders_name like '" + commitQueryInfo.getQueryFilterContent() + "%'";
@@ -443,7 +444,7 @@ public class OrdersController {
 		}
 		
 		sql += " order by success_orders.success_time desc";
-		
+
 		ArrayList<HashMap<String, Object>> resList = Global.ju.query(sql);
 		
 		int len = resList.size();
@@ -454,24 +455,24 @@ public class OrdersController {
 			res[i] = new QuerySuccessOrdersInfo();
 			
 			HashMap<String, Object> cur = resList.get(i);
-			
 			res[i].setOrdersId((String) cur.get("orders_id"));
 			res[i].setOrdersName((String) cur.get("orders_name"));
 			res[i].setOrdersStatus((String) cur.get("orders_status"));
 			res[i].setCreateTime((String) cur.get("create_time"));
 			res[i].setAccountName((String) cur.get("account_name"));
 			res[i].setUserPriority((String) cur.get("user_priority"));
-			
+
 			res[i].setSenderName((String) cur.get("sender_name"));
 			res[i].setSenderPhone((String) cur.get("sender_phone"));
-			res[i].setSenderAddress( ((String) cur.get("sender_address")).split("\\|") );
+
+			res[i].setSenderAddress(((String) cur.get("sender_address")).split("\\|"));
 			res[i].setSenderDetailAddress((String) cur.get("sender_detail_address"));
 
 			res[i].setReceiverName((String) cur.get("receiver_name"));
 			res[i].setReceiverPhone((String) cur.get("receiver_phone"));
 			res[i].setReceiverAddress(((String) cur.get("receiver_address")).split("\\|"));
 			res[i].setReceiverDetailAddress((String) cur.get("receiver_detail_address"));
-			
+
 			res[i].setSuccessTime((String) cur.get("success_time"));
 		}
 		
@@ -578,7 +579,7 @@ public class OrdersController {
 	}
 	
 	
-	@PostMapping("api/orders/cancleOrders")
+	@PostMapping("api/orders/cancleOrders") // 取消订单
 	public String CancleOrders(@RequestBody CancleOrdersInfo cancleOrdersInfo) {
 		ArrayList<HashMap<String, Object>> resList = 
 				Global.ju.query("select orders_status "
@@ -646,7 +647,7 @@ public class OrdersController {
 					
 					if(currentAddress.equals(totalAddress[0])) {
 						// 出库
-						String managerId = (String)Global.ju.query("select warehouse_managerId as result "
+						String managerId = (String)Global.ju.query("select warehouse_manager as result "
 								+ "from warehouse "
 								+ "where warehouse_address = ?",
 								currentAddress).get(0).get("result");
@@ -703,7 +704,7 @@ public class OrdersController {
 		}else {
 			if(((String) tmp.get(0).get("orders_status")).equals("进行中")){
 				ArrayList<HashMap<String, Object>>
-					curPos = Global.ju.query("select warehouse_address from warehouse where orders_id = ?", OrdersIdInfo.getOrdersId());
+					curPos = Global.ju.query("select warehouse_address from orders_position where orders_id = ?", OrdersIdInfo.getOrdersId());
 				String ordersCurrentPos = (String) curPos.get(0).get("warehouse_address");
 				String orderExpectedPos[] = ((String) Global.ju.query("select route from orders_route where orders_id = ?", 
 						OrdersIdInfo.getOrdersId()).get(0).get("route")).split("\\|");
@@ -711,26 +712,26 @@ public class OrdersController {
 				
 				if(len > 0 && ordersCurrentPos.equals(orderExpectedPos[len-1])) {
 					// 出库
-					String managerId = (String)Global.ju.query("select warehouse_managerId as result "
-							+ "from warehouse "
-							+ "where warehouse_address = ?",
-							curPos).get(0).get("result");
-					
+					String managerId = (String) Global.ju.query("select warehouse_manager"
+							+ " from warehouse "
+							+ " where warehouse_address = ?",
+							ordersCurrentPos).get(0).get("warehouse_manager");
+
 					GoodInfo goodInfo = new GoodInfo();
 					goodInfo.setOrderId(OrdersIdInfo.getOrdersId());
 					goodInfo.setManagerId(managerId);
-					
+
 					WarehouseController.tmpFunction(goodInfo);
 					// 更新订单状态
 					
 					Global.ju.execute("update orders "
 							+ "set orders_status = ? "
 							+ "where orders_id = ?", 
-							"取消", 
+							"已完成",
 							OrdersIdInfo.getOrdersId());
 					// 加入已完成订单
 					
-					Global.ju.query("insert into success_orders (orders_id) values (?)", OrdersIdInfo.getOrdersId());
+					Global.ju.execute("insert into success_orders (orders_id) values (?)", OrdersIdInfo.getOrdersId());
 					return "成功";
 				}else {
 					return "失败";

@@ -271,21 +271,19 @@ public class WarehouseController {
                 }
 
                 // 发送短信
-				/*
-				 * String totalRoute[] = ((String) Global.ju.query("select route " +
-				 * " from orders_route " + " where orders_id = ?",
-				 * goodInfo.getOrderId()).get(0).get("route")).split("\\|");
-				 * 
-				 * if(warehouse_address.equals(totalRoute[totalRoute.length-1])){ // 到达最后一战
-				 * 
-				 * HashMap<String, Object> resultMap = Global.ju.
-				 * query("select receiver_name, receiver_phone, orders_name from orders where orders_id = ?"
-				 * , goodInfo.getOrderId()).get(0);
-				 * 
-				 * Global.su.sendSMS( (String) resultMap.get("receiver_phone"),
-				 * (String)resultMap.get("receiver_name"), (String)
-				 * resultMap.get("orders_name"), warehouse_address); }
-				 */
+				String totalRoute[] = ((String) Global.ju.query("select route " +
+				 " from orders_route " + " where orders_id = ?",
+				 goodInfo.getOrderId()).get(0).get("route")).split("\\|");
+
+				 if(warehouse_address.equals(totalRoute[totalRoute.length-1])){ // 到达最后一战
+
+				 HashMap<String, Object> resultMap = Global.ju.
+				 query("select receiver_name, receiver_phone, orders_name from orders where orders_id = ?"
+				 , goodInfo.getOrderId()).get(0);
+
+				 Global.su.sendSMS( (String) resultMap.get("receiver_phone"),
+				 (String)resultMap.get("receiver_name"), (String)
+				 resultMap.get("orders_name"), warehouse_address); }
                 return "入库办理完成";
             }
         } else {
@@ -329,6 +327,7 @@ public class WarehouseController {
             Global.ju.execute(sql, good_id);
             // 写入出库记录
             sql = "insert into ex_warehouselist values(default,?,default,?)";
+            System.out.println("317行"+goodInfo.getManagerId());
             Global.ju.execute(sql, good_id, goodInfo.getManagerId());
             return "出库办理完成";
         } else {
@@ -400,14 +399,17 @@ public class WarehouseController {
         ArrayList<HashMap<String, Object>> list = Global.ju.query(sql);
         ArrayList<HashMap<String,Object>> res = new ArrayList<>();
 
-        for(int i = 0; i < list.size(); ++ i){
-            for(int j = 0;j < answer.size(); ++ j) {
-                if((list.get(i).get("orders_id").toString().equals(answer.get(j)))){
-                    res.add(list.get(i));
-                    break;
+        for (int i = 0; i < list.size(); ++i)
+            for (int j = 0; j < answer.size(); ++j)
+                try {
+                    if ((list.get(i).get("orders_id").toString().equals(answer.get(j)))) {
+                        res.add(list.get(i));
+                        break;
+                    }
+                } catch(NullPointerException e) {
+                    continue;
                 }
-            }
-        }
+
         return res;
     }
     // 根据省份查询仓库

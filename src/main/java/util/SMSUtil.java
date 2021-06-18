@@ -24,7 +24,7 @@ public class SMSUtil {
 				new NameValuePair("Uid", id),
 				new NameValuePair("Key", key),
 				new NameValuePair("smsMob",  targetPhoneNumber),
-				new NameValuePair("smsText", "尊敬的" + receiverName + "，您有新的快件" + ordersName + "到达" + address + "，请及时取件！")
+				new NameValuePair("smsText", "尊敬的用户[" + receiverName + "]，您有新的快件[" + ordersName + "]到达[" + address + "]，请及时取件！")
 		};
 		post.setRequestBody(data);
 
