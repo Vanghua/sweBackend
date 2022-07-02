@@ -327,7 +327,6 @@ public class WarehouseController {
             Global.ju.execute(sql, good_id);
             // 写入出库记录
             sql = "insert into ex_warehouselist values(default,?,default,?)";
-            System.out.println("317行"+goodInfo.getManagerId());
             Global.ju.execute(sql, good_id, goodInfo.getManagerId());
             return "出库办理完成";
         } else {
