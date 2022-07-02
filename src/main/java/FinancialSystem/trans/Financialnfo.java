@@ -16,6 +16,7 @@ public class Financialnfo {
     public Financialnfo(){
 
     }
+    //test
     public Financialnfo(int financeid,int billid,String money,Date time,String type){
         this.financeid = financeid;
         this.billid = billid;
