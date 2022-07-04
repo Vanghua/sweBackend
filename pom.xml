@@ -19,6 +19,12 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>com.github.xiaoymin</groupId>
+			<artifactId>knife4j-spring-boot-starter</artifactId>
+			<version>2.0.7</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -37,41 +43,41 @@
 			<artifactId>assertj-core</artifactId>
 		</dependency>
 		<!--樊华打包时使用的依赖-->
-<!--		<dependency>-->
-<!--			<groupId>Zyl</groupId>-->
-<!--			<artifactId>email</artifactId>-->
-<!--			<version>1.0.0</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>Zyl</groupId>
+			<artifactId>email</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>Zyl2</groupId>-->
-<!--			<artifactId>email2</artifactId>-->
-<!--			<version>1.0.0</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>Zyl2</groupId>
+			<artifactId>email2</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>Zyl3</groupId>-->
-<!--			<artifactId>mysql</artifactId>-->
-<!--			<version>1.0.0</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>Zyl3</groupId>
+			<artifactId>mysql</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>phoneMail1</groupId>-->
-<!--			<artifactId>phoneMail1</artifactId>-->
-<!--			<version>1.0.0</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>phoneMail1</groupId>
+			<artifactId>phoneMail1</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>phoneMail2</groupId>-->
-<!--			<artifactId>phoneMail2</artifactId>-->
-<!--			<version>1.0.0</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>phoneMail2</groupId>
+			<artifactId>phoneMail2</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>phoneMail3</groupId>-->
-<!--			<artifactId>phoneMail3</artifactId>-->
-<!--			<version>1.0.0</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>phoneMail3</groupId>
+			<artifactId>phoneMail3</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -83,33 +89,32 @@
 			</plugin>
 
 			<!-- 樊华打包时使用的插件 -->
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-surefire-plugin</artifactId>-->
-<!--				<version>2.22.2</version>-->
-<!--				<configuration>-->
-<!--					<skipTests>true</skipTests>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
 
 			<!-- 下面插件的作用是能够把本地引入的第三方jar包打包时打进war(测试打进jar不行) -->
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-war-plugin</artifactId>-->
-<!--				<configuration>-->
-<!--					<warName>${project.artifactId}</warName>-->
-<!--					<webResources>-->
-<!--						<resource>-->
-<!--							<directory>lib/</directory>-->
-<!--							<targetPath>WEB-INF/lib</targetPath>-->
-<!--							<includes>-->
-<!--								<include>**/*.jar</include>-->
-<!--							</includes>-->
-<!--						</resource>-->
-<!--					</webResources>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warName>${project.artifactId}</warName>
+					<webResources>
+						<resource>
+							<directory>lib/</directory>
+							<targetPath>WEB-INF/lib</targetPath>
+							<includes>
+								<include>**/*.jar</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>
