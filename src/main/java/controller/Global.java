@@ -18,7 +18,7 @@ public class Global {
 	
 	// mail configuration
 	public static String mailFrom = "2416116991@qq.com";
-	public static String mailPassword = "bgzbueqduyqzdjgh";
+	public static String mailPassword = "quyiselsftondidd";
 	public static MailUtil mu = new MailUtil(mailFrom, mailPassword);	
 	
 	// account type dictionary
