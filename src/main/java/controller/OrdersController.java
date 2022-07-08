@@ -2,7 +2,11 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
+import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +32,9 @@ import warehouseSystem.trans.GoodInfo;
 @RestController
 public class OrdersController {
 
+	@Autowired
+	RedisTemplate<String, String> redisTemplate; // 从spring容器中取得与Redis通信的对象
+
 	@PostMapping("api/orders/createOrders")
 	public String createOrders(@RequestBody CreateOrdersInfo createOrdersInfo) { // 客户发起待审核订单, 返回订单号
 
@@ -44,6 +51,7 @@ public class OrdersController {
 		}
 
 		ArrayList<HashMap<String, Object>> res =
+				// 樊华注：create_order是sql函数，负责创建订单。使用select调用该函数。向数据库中增加数据，不更新redis。
 				Global.ju.query(
 						"select create_order" +
 						"(?,?,?,?,?" +
@@ -66,27 +74,35 @@ public class OrdersController {
 	@PostMapping("api/orders/checkPass")
 	public String checkOrders(@RequestBody CheckPassInfo checkPassInfo ) { // 订单审核通过
 
+		// 先更新远程数据库
 		Global.ju.execute("update orders set orders_status = ?, good_priority = ?, good_weight = ?, orders_price = ? where orders_id = ?", 
 				"待支付",
 				checkPassInfo.getGoodPriority(),
 				checkPassInfo.getGoodWeight(),
 				checkPassInfo.getOrdersPrice(),
 				checkPassInfo.getOrdersId());
-		
+
+		// 更新redis数据库中的对应数据
+		redisTemplate.opsForValue().set(checkPassInfo.getOrdersId() + "checkPass", JSONObject.toJSONString(checkPassInfo), 60, TimeUnit.SECONDS);
+
 		Global.ju.execute("insert into check_result (orders_id, result, order_manager_name) values(?,?,?)", 
 				checkPassInfo.getOrdersId(), 
 				"通过", 
 				checkPassInfo.getOrderManagerName());
-		
+
 		return "审核完成";
 	}
 	
 	@PostMapping("api/orders/checkFail")
 	public String checkFail(@RequestBody CheckFailInfo checkFailInfo) { // 订单审核不通过
+		// 更新远程数据库
 		Global.ju.execute("update orders set orders_status = ? where orders_id = ?", 
 				"取消", 
 				checkFailInfo.getOrdersId());
-		
+
+		// 更新redis数据库中的对应数据
+		redisTemplate.opsForValue().set(checkFailInfo.getOrdersId() + "checkFail", JSONObject.toJSONString(checkFailInfo), 60, TimeUnit.SECONDS);
+
 		Global.ju.execute("insert into cancle_orders (orders_id, cancle_reason) values(?,?)", 
 				checkFailInfo.getOrdersId(),
 				checkFailInfo.getCancleReason());
@@ -95,7 +111,6 @@ public class OrdersController {
 				checkFailInfo.getOrdersId(), 
 				"不通过",
 				checkFailInfo.getOrderManagerName());
-		
 
 		return "审核完成";
 	}
@@ -131,41 +146,59 @@ public class OrdersController {
 		Global.ju.execute("update freq_address set freq_name = ?, freq_phone = ?, freq_address = ?, freq_detail_address = ?"
 				+ " where freq_id = ?", modifyFreqAddressInfo.getFreqName(), modifyFreqAddressInfo.getFreqPhone(),
 				formatAddress, modifyFreqAddressInfo.getFreqDetailAddress(), modifyFreqAddressInfo.getFreqId());
+
+		// 更新redis数据库中的对应数据
+		redisTemplate.opsForValue().set(modifyFreqAddressInfo.getFreqId() + "freq", JSONObject.toJSONString(modifyFreqAddressInfo), 60, TimeUnit.SECONDS);
+
 		return "成功";
 	}
 	
 	@PostMapping("api/orders/deleteFreqAddress")
 	public String deleteFreqAddress(@RequestBody FreqIdAddress freqIdAddress) { // 删除常用地址簿
 		Global.ju.execute("delete from freq_address where freq_id = ?", freqIdAddress.getFreqId());
+		// 空串表示数据已被删除
+		redisTemplate.opsForValue().set(freqIdAddress.getFreqId() + "freq", "", 60, TimeUnit.SECONDS);
 		return "成功";
 	}
 	
 	@PostMapping("api/orders/getFreqAddress")
 	public QueryFreqAddressInfo[] getFreqAddress(@RequestBody AccountNameInfo accountNameInfo) {  // 查询常用地址信息
-		// 获取某一个用户的所有地址簿信息。 其中的 freq_id 为地址簿编号（12位随机串）。不应该给用户显示，
-		// 但在用户选定常用地址进行删除和修改操作时，这个编号将被传给服务器，用于进行表的修改
-		ArrayList<HashMap<String, Object>> a = Global.ju.query
-				("select freq_id, freq_name, freq_phone, freq_address, freq_detail_address, freq_type "
-						+ "from freq_address "
-						+ "where account_name = ?",
-						accountNameInfo.getAccountName()
-				);
-		
-		int len = a.size();
-		QueryFreqAddressInfo[] res = new QueryFreqAddressInfo[len];
-		
-		for(int i = 0; i < len; ++i) {
-			res[i] = new QueryFreqAddressInfo();
-			res[i].setFreqId((String) a.get(i).get("freq_id"));
-			res[i].setFreqName((String) a.get(i).get("freq_name"));
-			res[i].setFreqPhone((String) a.get(i).get("freq_phone"));
-			String formatAddress = (String) a.get(i).get("freq_address");
-			res[i].setFreqAddress(formatAddress.split("\\|"));
-			res[i].setFreqDetailAddress((String) a.get(i).get("freq_detail_address"));
-			res[i].setFreqType((String) a.get(i).get("freq_type"));
+
+		// 首先查询redis缓存
+		Object o = redisTemplate.opsForValue().get(accountNameInfo.getAccountName() + "freqAddress");
+		// 若redis中无缓存则执行下述代码
+		if(o == null) {
+			// 获取某一个用户的所有地址簿信息。 其中的 freq_id 为地址簿编号（12位随机串）。不应该给用户显示，
+			// 但在用户选定常用地址进行删除和修改操作时，这个编号将被传给服务器，用于进行表的修改
+			ArrayList<HashMap<String, Object>> a = Global.ju.query
+					("select freq_id, freq_name, freq_phone, freq_address, freq_detail_address, freq_type "
+									+ "from freq_address "
+									+ "where account_name = ?",
+							accountNameInfo.getAccountName()
+					);
+
+			int len = a.size();
+			QueryFreqAddressInfo[] res = new QueryFreqAddressInfo[len];
+
+			for (int i = 0; i < len; ++i) {
+				res[i] = new QueryFreqAddressInfo();
+				res[i].setFreqId((String) a.get(i).get("freq_id"));
+				res[i].setFreqName((String) a.get(i).get("freq_name"));
+				res[i].setFreqPhone((String) a.get(i).get("freq_phone"));
+				String formatAddress = (String) a.get(i).get("freq_address");
+				res[i].setFreqAddress(formatAddress.split("\\|"));
+				res[i].setFreqDetailAddress((String) a.get(i).get("freq_detail_address"));
+				res[i].setFreqType((String) a.get(i).get("freq_type"));
+			}
+
+			// 将数据写入redis缓存
+			redisTemplate.opsForValue().set(accountNameInfo.getAccountName() + "freqAddress", JSONObject.toJSONString(res), 60, TimeUnit.SECONDS);
+
+			return res;
+		} else {
+			QueryFreqAddressInfo[] res = JSONObject.parseObject((String)o, QueryFreqAddressInfo[].class);
+			return res;
 		}
-		
-		return res;
 	}
 	
 	@PostMapping("api/orders/queryCancleOrders")
